@@ -1,0 +1,179 @@
+/* ============================================
+   CHART CARDS
+   ============================================ */
+
+.chart-card {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    transition: all var(--transition-base);
+}
+
+.chart-card:hover {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-md);
+}
+
+.chart-header {
+    margin-bottom: var(--spacing-xl);
+}
+
+.chart-header h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+}
+
+/* ============================================
+   LINE CHART
+   ============================================ */
+
+.chart-container {
+    position: relative;
+    width: 100%;
+}
+
+.line-chart {
+    width: 100%;
+    height: 300px;
+    margin-bottom: var(--spacing-md);
+}
+
+.line-chart path,
+.line-chart circle {
+    transition: all var(--transition-base);
+}
+
+.line-chart circle {
+    cursor: pointer;
+}
+
+.line-chart circle:hover {
+    r: 6;
+    filter: drop-shadow(0 0 8px var(--accent-cyan));
+}
+
+.chart-labels {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 var(--spacing-md);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+}
+
+/* ============================================
+   BAR CHART
+   ============================================ */
+
+.bar-chart-container {
+    padding: var(--spacing-lg) 0;
+}
+
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    gap: var(--spacing-xl);
+    height: 300px;
+    padding: 0 var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.bar {
+    position: relative;
+    flex: 1;
+    max-width: 120px;
+    min-height: 40px;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    transition: all var(--transition-slow);
+    cursor: pointer;
+    animation: barGrowth 0.8s ease-out;
+}
+
+@keyframes barGrowth {
+    from {
+        height: 0;
+        opacity: 0;
+    }
+    to {
+        height: var(--bar-height, 100%);
+        opacity: 1;
+    }
+}
+
+.bar-success {
+    background: linear-gradient(180deg, var(--success) 0%, rgba(16, 185, 129, 0.7) 100%);
+    box-shadow: 0 -4px 20px rgba(16, 185, 129, 0.3);
+}
+
+.bar-warning {
+    background: linear-gradient(180deg, var(--warning) 0%, rgba(245, 158, 11, 0.7) 100%);
+    box-shadow: 0 -4px 20px rgba(245, 158, 11, 0.3);
+}
+
+.bar-danger {
+    background: linear-gradient(180deg, var(--danger) 0%, rgba(239, 68, 68, 0.7) 100%);
+    box-shadow: 0 -4px 20px rgba(239, 68, 68, 0.3);
+}
+
+.bar:hover {
+    transform: scaleY(1.05);
+    filter: brightness(1.2);
+}
+
+.bar-value {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: var(--bg-tertiary);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    opacity: 0;
+    transition: all var(--transition-base);
+}
+
+.bar:hover .bar-value {
+    opacity: 1;
+    top: -32px;
+}
+
+.bar-labels {
+    display: flex;
+    justify-content: space-around;
+    gap: var(--spacing-xl);
+    padding: 0 var(--spacing-lg);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.bar-labels span {
+    flex: 1;
+    max-width: 120px;
+    text-align: center;
+}
+
+/* Responsive Charts */
+@media (max-width: 768px) {
+    .line-chart {
+        height: 200px;
+    }
+    
+    .bar-chart {
+        height: 200px;
+        gap: var(--spacing-md);
+    }
+    
+    .chart-labels,
+    .bar-labels {
+        font-size: 0.625rem;
+    }
+}

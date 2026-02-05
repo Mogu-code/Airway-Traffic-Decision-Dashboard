@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirTraffic - Dashboard Overview</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="sidebar.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="charts.css">
+    <link rel="stylesheet" href="tables.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 16V8C21 7.45 20.55 7 20 7H15L12.59 4.59C12.21 4.21 11.7 4 11.17 4H4C3.45 4 3 4.45 3 5V19C3 19.55 3.45 20 4 20H20C20.55 20 21 19.55 21 19V17.5" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 9L17 12L12 15V9Z" fill="currentColor"/>
+                </svg>
+                <span class="logo-text">AirTraffic</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                    <rect x="3" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                    <rect x="13" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                    <rect x="13" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Overview</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 8h18M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8M3 8l3-5h12l3 5" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Airport Congestion</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Delays & Cancellations</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Aircraft Traffic</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 15h18M9 9l-6 6 6 6" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 3C8 10 8 14 12 21" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Weather Impact</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>About</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <p>© 2025 AirTraffic Dashboard</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <button class="collapse-btn" aria-label="Toggle Sidebar">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+                <div class="page-title">
+                    <h1>Dashboard Overview</h1>
+                    <p>Real-time airway traffic monitoring</p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="search-bar">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                        <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <input type="text" placeholder="Search flights, airports...">
+                </div>
+
+                <button class="icon-btn theme-toggle" aria-label="Toggle Theme">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+
+                <button class="icon-btn notifications" aria-label="Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span class="badge">3</span>
+                </button>
+
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="8" r="4" fill="currentColor"/>
+                            <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Controller</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-container">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card stat-card-primary">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 11l8-4.5" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Total Flights Today</h3>
+                        <div class="stat-value">30</div>
+                        <div class="stat-change positive">
+                            ↑ 8% from yesterday
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-card-warning">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Delayed Flights</h3>
+                        <div class="stat-value">12</div>
+                        <div class="stat-meta">40% of total</div>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-card-danger">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M15 9l-6 6M9 9l6 6" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Cancelled Flights</h3>
+                        <div class="stat-value">3</div>
+                        <div class="stat-meta">10% of total</div>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-card-alert">
+                    <div class="stat-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 8h18M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8M3 8l3-5h12l3 5" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="13" r="2" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Congested Airports</h3>
+                        <div class="stat-value">9</div>
+                        <div class="stat-meta">High congestion level</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <!-- Flights Per Hour Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Flights Per Hour (Today)</h2>
+                    </div>
+                    <div class="chart-container">
+                        <svg class="line-chart" viewBox="0 0 800 300" preserveAspectRatio="none">
+                            <defs>
+                                <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:rgba(6, 182, 212, 0.3);stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:rgba(6, 182, 212, 0);stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                            
+                            <!-- Grid lines -->
+                            <line x1="0" y1="225" x2="800" y2="225" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                            <line x1="0" y1="150" x2="800" y2="150" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                            <line x1="0" y1="75" x2="800" y2="75" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                            
+                            <!-- Area fill -->
+                            <path d="M 0 225 L 50 225 L 100 225 L 150 225 L 200 225 L 250 75 L 300 75 L 350 75 L 400 75 L 450 75 L 500 75 L 550 75 L 600 75 L 650 75 L 700 225 L 750 225 L 800 225 L 800 300 L 0 300 Z" 
+                                  fill="url(#lineGradient)"/>
+                            
+                            <!-- Line path -->
+                            <path d="M 0 225 L 50 225 L 100 225 L 150 225 L 200 225 L 250 75 L 300 75 L 350 75 L 400 75 L 450 75 L 500 75 L 550 75 L 600 75 L 650 75 L 700 225 L 750 225 L 800 225" 
+                                  stroke="#06b6d4" 
+                                  stroke-width="3" 
+                                  fill="none"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"/>
+                            
+                            <!-- Data points -->
+                            <circle cx="0" cy="225" r="4" fill="#06b6d4"/>
+                            <circle cx="50" cy="225" r="4" fill="#06b6d4"/>
+                            <circle cx="100" cy="225" r="4" fill="#06b6d4"/>
+                            <circle cx="150" cy="225" r="4" fill="#06b6d4"/>
+                            <circle cx="200" cy="225" r="4" fill="#06b6d4"/>
+                            <circle cx="250" cy="75" r="4" fill="#06b6d4"/>
+                            <circle cx="300" cy="75" r="4" fill="#06b6d4"/>
+                            <circle cx="350" cy="75" r="4" fill="#06b6d4"/>
+                            <circle cx="400" cy="75" r="4" fill="#06b6d4"/>
+                            <circle cx="450" cy="75" r="4" fill="#06b6d4"/>
+                            <circle cx="500" cy="75" r="4" fill="#06b6d4"/>
+                            <circle cx="550" cy="75" r="4" fill="#06b6d4"/>
+                            <circle cx="600" cy="75" r="4" fill="#06b6d4"/>
+                            <circle cx="650" cy="75" r="4" fill="#06b6d4"/>
+                            <circle cx="700" cy="225" r="4" fill="#06b6d4"/>
+                            <circle cx="750" cy="225" r="4" fill="#06b6d4"/>
+                            <circle cx="800" cy="225" r="4" fill="#06b6d4"/>
+                        </svg>
+                        
+                        <div class="chart-labels">
+                            <span>05:00</span>
+                            <span>07:00</span>
+                            <span>09:00</span>
+                            <span>11:00</span>
+                            <span>13:00</span>
+                            <span>15:00</span>
+                            <span>17:00</span>
+                            <span>19:00</span>
+                            <span>21:00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delay Distribution Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Delay Distribution</h2>
+                    </div>
+                    <div class="chart-container bar-chart-container">
+                        <div class="bar-chart">
+                            <div class="bar bar-success" style="height: 66.67%;">
+                                <span class="bar-value">16</span>
+                            </div>
+                            <div class="bar bar-warning" style="height: 25%;">
+                                <span class="bar-value">6</span>
+                            </div>
+                            <div class="bar bar-danger" style="height: 25%;">
+                                <span class="bar-value">6</span>
+                            </div>
+                        </div>
+                        <div class="bar-labels">
+                            <span>On Time</span>
+                            <span>&lt; 30 min</span>
+                            <span>&gt; 30 min</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables Row -->
+            <div class="tables-row">
+                <!-- Recent Delayed Flights -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <h2>Recent Delayed Flights</h2>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Flight</th>
+                                    <th>Route</th>
+                                    <th>Delay</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="flight-number">UA567</span></td>
+                                    <td class="route">ORD → SFO</td>
+                                    <td class="delay-time warning">25 min</td>
+                                    <td><span class="status-badge status-delayed">Delayed</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="flight-number">SW123</span></td>
+                                    <td class="route">DEN → PHX</td>
+                                    <td class="delay-time warning">45 min</td>
+                                    <td><span class="status-badge status-delayed">Delayed</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="flight-number">AA789</span></td>
+                                    <td class="route">MIA → DFW</td>
+                                    <td class="delay-time success">15 min</td>
+                                    <td><span class="status-badge status-delayed">Delayed</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="flight-number">DL567</span></td>
+                                    <td class="route">DTW → MSP</td>
+                                    <td class="delay-time danger">60 min</td>
+                                    <td><span class="status-badge status-delayed">Delayed</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="flight-number">SW789</span></td>
+                                    <td class="route">LAS → OAK</td>
+                                    <td class="delay-time warning">35 min</td>
+                                    <td><span class="status-badge status-delayed">Delayed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Top Congested Airports -->
+                <div class="table-card">
+                    <div class="table-header">
+                        <h2>Top Congested Airports</h2>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Airport</th>
+                                    <th>City</th>
+                                    <th>Active</th>
+                                    <th>Level</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="airport-code">DXB</div>
+                                        <div class="airport-name">Dubai International</div>
+                                    </td>
+                                    <td>Dubai</td>
+                                    <td class="active-count">185</td>
+                                    <td><span class="congestion-badge high">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="airport-code">LHR</div>
+                                        <div class="airport-name">London Heathrow</div>
+                                    </td>
+                                    <td>London</td>
+                                    <td class="active-count">168</td>
+                                    <td><span class="congestion-badge high">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="airport-code">ATL</div>
+                                        <div class="airport-name">Hartsfield-Jackson Atlanta</div>
+                                    </td>
+                                    <td>Atlanta</td>
+                                    <td class="active-count">156</td>
+                                    <td><span class="congestion-badge high">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="airport-code">JFK</div>
+                                        <div class="airport-name">John F. Kennedy International</div>
+                                    </td>
+                                    <td>New York</td>
+                                    <td class="active-count">145</td>
+                                    <td><span class="congestion-badge high">High</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="airport-code">CDG</div>
+                                        <div class="airport-name">Paris Charles de Gaulle</div>
+                                    </td>
+                                    <td>Paris</td>
+                                    <td class="active-count">142</td>
+                                    <td><span class="congestion-badge high">High</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
