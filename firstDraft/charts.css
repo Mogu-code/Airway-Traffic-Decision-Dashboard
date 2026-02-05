@@ -1,7 +1,3 @@
-/* ============================================
-   CHART CARDS
-   ============================================ */
-
 .chart-card {
     background: var(--bg-secondary);
     border: 1px solid rgba(255, 255, 255, 0.05);
@@ -26,9 +22,6 @@
     letter-spacing: -0.01em;
 }
 
-/* ============================================
-   LINE CHART
-   ============================================ */
 
 .chart-container {
     position: relative;
@@ -63,10 +56,6 @@
     font-size: 0.75rem;
     font-family: var(--font-mono);
 }
-
-/* ============================================
-   BAR CHART
-   ============================================ */
 
 .bar-chart-container {
     padding: var(--spacing-lg) 0;
@@ -161,7 +150,6 @@
     text-align: center;
 }
 
-/* Responsive Charts */
 @media (max-width: 768px) {
     .line-chart {
         height: 200px;
