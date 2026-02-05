@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="tables.css">
 </head>
 <body>
-    <!-- Sidebar Navigation -->
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo">
@@ -78,10 +77,7 @@
             <p>© 2025 AirTraffic Dashboard</p>
         </div>
     </aside>
-
-    <!-- Main Content -->
     <main class="main-content">
-        <!-- Top Header -->
         <header class="top-header">
             <div class="header-left">
                 <button class="collapse-btn" aria-label="Toggle Sidebar">
@@ -132,10 +128,7 @@
                 </div>
             </div>
         </header>
-
-        <!-- Dashboard Content -->
         <div class="dashboard-container">
-            <!-- Stats Grid -->
             <div class="stats-grid">
                 <div class="stat-card stat-card-primary">
                     <div class="stat-icon">
@@ -195,10 +188,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Charts Row -->
             <div class="charts-row">
-                <!-- Flights Per Hour Chart -->
                 <div class="chart-card">
                     <div class="chart-header">
                         <h2>Flights Per Hour (Today)</h2>
@@ -216,20 +206,14 @@
                             <line x1="0" y1="225" x2="800" y2="225" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
                             <line x1="0" y1="150" x2="800" y2="150" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
                             <line x1="0" y1="75" x2="800" y2="75" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
-                            
-                            <!-- Area fill -->
                             <path d="M 0 225 L 50 225 L 100 225 L 150 225 L 200 225 L 250 75 L 300 75 L 350 75 L 400 75 L 450 75 L 500 75 L 550 75 L 600 75 L 650 75 L 700 225 L 750 225 L 800 225 L 800 300 L 0 300 Z" 
                                   fill="url(#lineGradient)"/>
-                            
-                            <!-- Line path -->
                             <path d="M 0 225 L 50 225 L 100 225 L 150 225 L 200 225 L 250 75 L 300 75 L 350 75 L 400 75 L 450 75 L 500 75 L 550 75 L 600 75 L 650 75 L 700 225 L 750 225 L 800 225" 
                                   stroke="#06b6d4" 
                                   stroke-width="3" 
                                   fill="none"
                                   stroke-linecap="round"
                                   stroke-linejoin="round"/>
-                            
-                            <!-- Data points -->
                             <circle cx="0" cy="225" r="4" fill="#06b6d4"/>
                             <circle cx="50" cy="225" r="4" fill="#06b6d4"/>
                             <circle cx="100" cy="225" r="4" fill="#06b6d4"/>
@@ -248,7 +232,6 @@
                             <circle cx="750" cy="225" r="4" fill="#06b6d4"/>
                             <circle cx="800" cy="225" r="4" fill="#06b6d4"/>
                         </svg>
-                        
                         <div class="chart-labels">
                             <span>05:00</span>
                             <span>07:00</span>
@@ -262,8 +245,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Delay Distribution Chart -->
                 <div class="chart-card">
                     <div class="chart-header">
                         <h2>Delay Distribution</h2>
@@ -288,10 +269,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Tables Row -->
             <div class="tables-row">
-                <!-- Recent Delayed Flights -->
                 <div class="table-card">
                     <div class="table-header">
                         <h2>Recent Delayed Flights</h2>
@@ -341,8 +319,6 @@
                         </table>
                     </div>
                 </div>
-
-                <!-- Top Congested Airports -->
                 <div class="table-card">
                     <div class="table-header">
                         <h2>Top Congested Airports</h2>
