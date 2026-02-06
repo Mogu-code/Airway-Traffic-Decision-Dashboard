@@ -161,6 +161,35 @@
                 </div>
             </div>
         </div>
+
+        <!-- Flight Details Table Section -->
+        <div class="table-section">
+            <div class="table-header">
+                <h2 class="section-title">Flight Details</h2>
+                <a href="flight-details.html" class="view-all-link">View All →</a>
+            </div>
+            
+            <div class="table-card">
+                <div class="table-wrapper">
+                    <table class="flights-table">
+                        <thead>
+                            <tr>
+                                <th>Flight No</th>
+                                <th>Airline</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Scheduled</th>
+                                <th>Delay</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboardFlightsTable">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
