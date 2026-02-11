@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aircraft Traffic & Density Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f1419;
+            color: #e4e6eb;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: #1a1f2e;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 30px;
+            color: #3dd5b3;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .logo svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            color: #8e9aaf;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: #252d3d;
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: #1e3a3a;
+            color: #3dd5b3;
+            border-left: 3px solid #3dd5b3;
+        }
+
+        .nav-item svg {
+            width: 18px;
+            height: 18px;
+            margin-right: 12px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px;
+            flex: 1;
+            padding: 0;
+        }
+
+        /* Header */
+        .header {
+            background: #1a1f2e;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a2f3e;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .header-title p {
+            font-size: 13px;
+            color: #8e9aaf;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-box {
+            background: #252d3d;
+            border: 1px solid #3a4556;
+            border-radius: 6px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 250px;
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            color: #fff;
+            outline: none;
+            width: 100%;
+            font-size: 13px;
+        }
+
+        .search-box input::placeholder {
+            color: #6c7a89;
+        }
+
+        .icon-btn {
+            background: #252d3d;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8e9aaf;
+            transition: all 0.3s;
+        }
+
+        .icon-btn:hover {
+            background: #2f3947;
+            color: #fff;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #252d3d;
+            padding: 6px 12px 6px 6px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #3dd5b3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: #0f1419;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: #8e9aaf;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 30px 40px;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            color: #8e9aaf;
+            font-weight: 500;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        select {
+            background: #1a1f2e;
+            border: 1px solid #3a4556;
+            color: #fff;
+            padding: 10px 35px 10px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            appearance: none;
+            min-width: 150px;
+            transition: all 0.3s;
+        }
+
+        select:hover {
+            border-color: #3dd5b3;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3dd5b3;
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #8e9aaf;
+            font-size: 10px;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #1a1f2e;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #2a2f3e;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .card-action-btn {
+            background: #252d3d;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8e9aaf;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .card-action-btn:hover {
+            background: #2f3947;
+            color: #3dd5b3;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Donut Chart */
+        .donut-chart {
+            width: 220px;
+            height: 220px;
+            position: relative;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Bar Chart */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 250px;
+            gap: 8px;
+            padding-top: 20px;
+        }
+
+        .bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            height: 100%;
+        }
+
+        .bar {
+            width: 100%;
+            background: #3dd5b3;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .bar:hover {
+            background: #4de5c3;
+            transform: translateY(-3px);
+        }
+
+        .bar-label {
+            font-size: 11px;
+            color: #8e9aaf;
+            margin-top: auto;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #3dd5b3;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .bar:hover .bar-value {
+            opacity: 1;
+        }
+
+        /* Line Chart */
+        .line-chart-container {
+            height: 250px;
+            position: relative;
+            margin-top: 20px;
+        }
+
+        #lineChart {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Full Width Card */
+        .full-width-card {
+            grid-column: 1 / -1;
+        }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .data-table thead {
+            background: #252d3d;
+        }
+
+        .data-table th {
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #8e9aaf;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            padding: 15px;
+            font-size: 14px;
+            border-bottom: 1px solid #252d3d;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.3s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #252d3d;
+        }
+
+        .aircraft-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid;
+        }
+
+        .badge-narrow {
+            background: rgba(61, 213, 179, 0.1);
+            color: #3dd5b3;
+            border-color: #3dd5b3;
+        }
+
+        .badge-wide {
+            background: rgba(76, 201, 107, 0.1);
+            color: #4cc96b;
+            border-color: #4cc96b;
+        }
+
+        .badge-cargo {
+            background: rgba(255, 171, 64, 0.1);
+            color: #ffab40;
+            border-color: #ffab40;
+        }
+
+        .occupancy-bar {
+            width: 100px;
+            height: 6px;
+            background: #252d3d;
+            border-radius: 3px;
+            overflow: hidden;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .occupancy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3dd5b3, #4de5c3);
+            border-radius: 3px;
+            transition: width 0.5s;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #1a1f2e;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2a2f3e;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #3dd5b3;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            background: rgba(76, 201, 107, 0.1);
+            color: #4cc96b;
+        }
+
+        .stat-change.negative {
+            background: rgba(255, 82, 82, 0.1);
+            color: #ff5252;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #8e9aaf;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            background: #252d3d;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+            border: 1px solid #3a4556;
+            white-space: nowrap;
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Export Button */
+        .export-btn {
+            background: #3dd5b3;
+            color: #0f1419;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .export-btn:hover {
+            background: #4de5c3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(61, 213, 179, 0.3);
+        }
+
+        /* Real-time indicator */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 82, 82, 0.1);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #ff5252;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background: #ff5252;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(0.95);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <svg fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                </svg>
+                AirTraffic
+            </div>
+            <nav>
+                <div class="nav-item">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                    </svg>
+                    Overview
+                </div>
+                <div class="nav-item">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+                    </svg>
+                    Airport Congestion
+                </div>
+                <div class="nav-item">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                    </svg>
+                    Delays & Cancellations
+                </div>
+                <div class="nav-item active">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                    </svg>
+                    Aircraft Traffic
+                </div>
+                <div class="nav-item">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4c-1.48 0-2.85.43-4.01 1.17l1.46 1.46C10.21 6.23 11.08 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3 0 1.13-.64 2.11-1.56 2.62l1.45 1.45C23.16 18.16 24 16.68 24 15c0-2.64-2.05-4.78-4.65-4.96zM3 5.27l2.75 2.74C2.56 8.15 0 10.77 0 14c0 3.31 2.69 6 6 6h11.73l2 2L21 20.73 4.27 4 3 5.27zM7.73 10l8 8H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h1.73z"/>
+                    </svg>
+                    Weather Impact
+                </div>
+                <div class="nav-item">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                    About
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-title">
+                    <h1>Aircraft Traffic & Density</h1>
+                    <p>Real-time airway traffic monitoring</p>
+                </div>
+                <div class="header-actions">
+                    <div class="live-indicator">
+                        <span class="live-dot"></span>
+                        LIVE
+                    </div>
+                    <div class="search-box">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                        <input type="text" placeholder="Search flights, airports...">
+                    </div>
+                    <button class="icon-btn">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <button class="icon-btn">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                        </svg>
+                    </button>
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">Admin User</div>
+                            <div class="user-role">Controller</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <label class="filter-label">Aircraft Type</label>
+                        <div class="select-wrapper">
+                            <select id="aircraftFilter">
+                                <option>All Types</option>
+                                <option>Narrow Body</option>
+                                <option>Wide Body</option>
+                                <option>Cargo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Airline</label>
+                        <div class="select-wrapper">
+                            <select id="airlineFilter">
+                                <option>All Airlines</option>
+                                <option>American Airlines</option>
+                                <option>United Airlines</option>
+                                <option>Delta Airlines</option>
+                                <option>Southwest</option>
+                                <option>British Airways</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Time Range</label>
+                        <div class="select-wrapper">
+                            <select id="timeFilter">
+                                <option>Last 24 Hours</option>
+                                <option>Last 7 Days</option>
+                                <option>Last 30 Days</option>
+                                <option>Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">&nbsp;</label>
+                        <button class="export-btn" onclick="exportData()">
+                            Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: rgba(61, 213, 179, 0.1); color: #3dd5b3;">
+                                ✈️
+                            </div>
+                            <div class="stat-change positive">↑ 12%</div>
+                        </div>
+                        <div class="stat-value" id="totalFlights">0</div>
+                        <div class="stat-label">Total Flights Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: rgba(76, 201, 107, 0.1); color: #4cc96b;">
+                                📊
+                            </div>
+                            <div class="stat-change positive">↑ 8%</div>
+                        </div>
+                        <div class="stat-value" id="avgOccupancy">0%</div>
+                        <div class="stat-label">Average Occupancy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: rgba(255, 171, 64, 0.1); color: #ffab40;">
+                                🌍
+                            </div>
+                            <div class="stat-change negative">↓ 3%</div>
+                        </div>
+                        <div class="stat-value" id="activeAirports">0</div>
+                        <div class="stat-label">Active Airports</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: rgba(255, 82, 82, 0.1); color: #ff5252;">
+                                ⚡
+                            </div>
+                            <div class="stat-change positive">↑ 15%</div>
+                        </div>
+                        <div class="stat-value" id="peakTraffic">0</div>
+                        <div class="stat-label">Peak Traffic Hour</div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Aircraft Type Distribution -->
+                    <div class="card">
+                        <div class="card-title">
+                            <span>Aircraft Type Distribution</span>
+                            <div class="card-actions">
+                                <button class="card-action-btn" onclick="refreshChart('donut')">↻</button>
+                                <button class="card-action-btn" onclick="toggleFullscreen(this)">⛶</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="donutChart" class="donut-chart"></canvas>
+                        </div>
+                        <div class="chart-legend" id="donutLegend"></div>
+                    </div>
+
+                    <!-- Flights Per Airport -->
+                    <div class="card">
+                        <div class="card-title">
+                            <span>Flights Per Airport (Top 10)</span>
+                            <div class="card-actions">
+                                <button class="card-action-btn" onclick="refreshChart('bar')">↻</button>
+                                <button class="card-action-btn" onclick="toggleFullscreen(this)">⛶</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="bar-chart" id="barChart"></div>
+                        </div>
+                    </div>
+
+                    <!-- Hourly Traffic Volume -->
+                    <div class="card full-width-card">
+                        <div class="card-title">
+                            <span>Hourly Traffic Volume</span>
+                            <div class="card-actions">
+                                <button class="card-action-btn" onclick="refreshChart('line')">↻</button>
+                                <button class="card-action-btn" onclick="toggleFullscreen(this)">⛶</button>
+                            </div>
+                        </div>
+                        <div class="line-chart-container">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Aircraft Traffic Data Table -->
+                    <div class="card full-width-card">
+                        <div class="card-title">
+                            <span>Aircraft Traffic Data</span>
+                            <div class="card-actions">
+                                <button class="card-action-btn" onclick="sortTable()">⇅</button>
+                                <button class="card-action-btn" onclick="filterTable()">⚙</button>
+                            </div>
+                        </div>
+                        <table class="data-table" id="trafficTable">
+                            <thead>
+                                <tr>
+                                    <th>Aircraft Type</th>
+                                    <th>Airline</th>
+                                    <th>Number of Flights</th>
+                                    <th>Avg Occupancy</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Data
+        const trafficData = [
+            { type: 'Wide Body', airline: 'American Airlines', flights: 2, occupancy: 78 },
+            { type: 'Narrow Body', airline: 'United Airlines', flights: 4, occupancy: 83 },
+            { type: 'Narrow Body', airline: 'Delta Airlines', flights: 4, occupancy: 76 },
+            { type: 'Narrow Body', airline: 'Southwest', flights: 4, occupancy: 78 },
+            { type: 'Wide Body', airline: 'British Airways', flights: 1, occupancy: 76 },
+            { type: 'Narrow Body', airline: 'American Airlines', flights: 4, occupancy: 99 },
+            { type: 'Cargo', airline: 'FedEx', flights: 3, occupancy: 92 },
+            { type: 'Wide Body', airline: 'Emirates', flights: 2, occupancy: 88 },
+        ];
+
+        const airportData = [
+            { code: 'JFK', flights: 2.1 },
+            { code: 'ORD', flights: 2.0 },
+            { code: 'DEN', flights: 2.2 },
+            { code: 'ATL', flights: 1.2 },
+            { code: 'LHR', flights: 1.1 },
+            { code: 'MIA', flights: 1.3 },
+            { code: 'SFO', flights: 1.2 },
+            { code: 'DTW', flights: 1.3 },
+            { code: 'MEM', flights: 1.3 },
+            { code: 'DFW', flights: 1.2 },
+        ];
+
+        const hourlyData = [
+            { hour: '00:00', volume: 1.0 },
+            { hour: '01:00', volume: 1.0 },
+            { hour: '02:00', volume: 1.0 },
+            { hour: '03:00', volume: 1.0 },
+            { hour: '04:00', volume: 1.0 },
+            { hour: '05:00', volume: 1.0 },
+            { hour: '06:00', volume: 1.0 },
+            { hour: '07:00', volume: 1.5 },
+            { hour: '08:00', volume: 2.1 },
+            { hour: '09:00', volume: 2.1 },
+            { hour: '10:00', volume: 2.1 },
+            { hour: '11:00', volume: 2.1 },
+            { hour: '12:00', volume: 2.1 },
+            { hour: '13:00', volume: 2.1 },
+            { hour: '14:00', volume: 2.1 },
+            { hour: '15:00', volume: 2.1 },
+            { hour: '16:00', volume: 2.1 },
+            { hour: '17:00', volume: 2.1 },
+            { hour: '18:00', volume: 2.1 },
+            { hour: '19:00', volume: 1.7 },
+            { hour: '20:00', volume: 1.3 },
+            { hour: '21:00', volume: 1.0 },
+            { hour: '22:00', volume: 1.0 },
+            { hour: '23:00', volume: 1.0 },
+        ];
+
+        // Initialize stats
+        function animateValue(element, start, end, duration, suffix = '') {
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.round(current) + suffix;
+            }, 16);
+        }
+
+        function updateStats() {
+            const totalFlights = trafficData.reduce((sum, item) => sum + item.flights, 0);
+            const avgOccupancy = Math.round(trafficData.reduce((sum, item) => sum + item.occupancy, 0) / trafficData.length);
+            const activeAirports = airportData.length;
+            const peakHour = hourlyData.reduce((max, item) => item.volume > max.volume ? item : max).hour;
+
+            animateValue(document.getElementById('totalFlights'), 0, totalFlights, 1000);
+            animateValue(document.getElementById('avgOccupancy'), 0, avgOccupancy, 1000, '%');
+            animateValue(document.getElementById('activeAirports'), 0, activeAirports, 1000);
+            document.getElementById('peakTraffic').textContent = peakHour;
+        }
+
+        // Populate table
+        function populateTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            trafficData.forEach(item => {
+                const row = tbody.insertRow();
+                
+                const typeCell = row.insertCell();
+                const badgeClass = item.type === 'Narrow Body' ? 'badge-narrow' : 
+                                   item.type === 'Wide Body' ? 'badge-wide' : 'badge-cargo';
+                typeCell.innerHTML = `<span class="aircraft-badge ${badgeClass}">${item.type}</span>`;
+                
+                row.insertCell().textContent = item.airline;
+                row.insertCell().textContent = item.flights;
+                
+                const occupancyCell = row.insertCell();
+                occupancyCell.innerHTML = `
+                    <div class="occupancy-bar">
+                        <div class="occupancy-fill" style="width: ${item.occupancy}%"></div>
+                    </div>
+                    ${item.occupancy}%
+                `;
+            });
+        }
+
+        // Draw Donut Chart
+        function drawDonutChart() {
+            const canvas = document.getElementById('donutChart');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 80;
+            const innerRadius = 50;
+
+            // Calculate totals
+            const typeCounts = {};
+            trafficData.forEach(item => {
+                typeCounts[item.type] = (typeCounts[item.type] || 0) + item.flights;
+            });
+
+            const total = Object.values(typeCounts).reduce((sum, val) => sum + val, 0);
+            const colors = {
+                'Narrow Body': '#3dd5b3',
+                'Wide Body': '#4cc96b',
+                'Cargo': '#ffab40'
+            };
+
+            // Draw segments
+            let currentAngle = -Math.PI / 2;
+            Object.entries(typeCounts).forEach(([type, count]) => {
+                const sliceAngle = (count / total) * 2 * Math.PI;
+                
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.arc(centerX, centerY, innerRadius, currentAngle + sliceAngle, currentAngle, true);
+                ctx.closePath();
+                ctx.fillStyle = colors[type];
+                ctx.fill();
+
+                currentAngle += sliceAngle;
+            });
+
+            // Update legend
+            const legend = document.getElementById('donutLegend');
+            legend.innerHTML = '';
+            Object.entries(typeCounts).forEach(([type, count]) => {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.innerHTML = `
+                    <div class="legend-color" style="background: ${colors[type]}"></div>
+                    <span>${type}</span>
+                `;
+                legend.appendChild(item);
+            });
+        }
+
+        // Draw Bar Chart
+        function drawBarChart() {
+            const container = document.getElementById('barChart');
+            container.innerHTML = '';
+
+            const maxFlights = Math.max(...airportData.map(d => d.flights));
+
+            airportData.forEach(airport => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'bar-wrapper';
+
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                const height = (airport.flights / maxFlights) * 100;
+                bar.style.height = height + '%';
+
+                const value = document.createElement('div');
+                value.className = 'bar-value';
+                value.textContent = airport.flights;
+                bar.appendChild(value);
+
+                const label = document.createElement('div');
+                label.className = 'bar-label';
+                label.textContent = airport.code;
+
+                wrapper.appendChild(bar);
+                wrapper.appendChild(label);
+                container.appendChild(wrapper);
+
+                // Add hover effect
+                bar.addEventListener('mouseenter', (e) => {
+                    showTooltip(e, `${airport.code}: ${airport.flights} flights`);
+                });
+                bar.addEventListener('mouseleave', hideTooltip);
+            });
+        }
+
+        // Draw Line Chart
+        function drawLineChart() {
+            const canvas = document.getElementById('lineChart');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            const padding = 40;
+            const width = canvas.width - padding * 2;
+            const height = canvas.height - padding * 2;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw axes
+            ctx.strokeStyle = '#3a4556';
+            ctx.lineWidth = 1;
+            
+            // Y-axis
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, canvas.height - padding);
+            ctx.stroke();
+
+            // X-axis
+            ctx.beginPath();
+            ctx.moveTo(padding, canvas.height - padding);
+            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.stroke();
+
+            // Draw line
+            const maxVolume = Math.max(...hourlyData.map(d => d.volume));
+            const xStep = width / (hourlyData.length - 1);
+
+            ctx.strokeStyle = '#3dd5b3';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            hourlyData.forEach((point, index) => {
+                const x = padding + index * xStep;
+                const y = canvas.height - padding - (point.volume / maxVolume) * height;
+
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+
+                // Draw point
+                ctx.fillStyle = '#3dd5b3';
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+
+            ctx.stroke();
+
+            // Draw labels
+            ctx.fillStyle = '#8e9aaf';
+            ctx.font = '11px Segoe UI';
+            ctx.textAlign = 'center';
+
+            hourlyData.forEach((point, index) => {
+                if (index % 3 === 0) {
+                    const x = padding + index * xStep;
+                    ctx.fillText(point.hour, x, canvas.height - padding + 20);
+                }
+            });
+        }
+
+        // Tooltip functions
+        function showTooltip(e, text) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.textContent = text;
+            tooltip.style.opacity = '1';
+            tooltip.style.left = e.pageX + 10 + 'px';
+            tooltip.style.top = e.pageY - 30 + 'px';
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').style.opacity = '0';
+        }
+
+        // Utility functions
+        function refreshChart(type) {
+            const charts = {
+                'donut': drawDonutChart,
+                'bar': drawBarChart,
+                'line': drawLineChart
+            };
+            if (charts[type]) {
+                charts[type]();
+            }
+        }
+
+        function toggleFullscreen(btn) {
+            const card = btn.closest('.card');
+            if (!document.fullscreenElement) {
+                card.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function exportData() {
+            // Create CSV content
+            let csv = 'Aircraft Type,Airline,Number of Flights,Avg Occupancy\n';
+            trafficData.forEach(row => {
+                csv += `${row.type},${row.airline},${row.flights},${row.occupancy}%\n`;
+            });
+
+            // Download CSV
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `aircraft-traffic-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function sortTable() {
+            const tbody = document.getElementById('tableBody');
+            const rows = Array.from(tbody.rows);
+            const sorted = rows.sort((a, b) => {
+                return parseInt(b.cells[2].textContent) - parseInt(a.cells[2].textContent);
+            });
+            tbody.innerHTML = '';
+            sorted.forEach(row => tbody.appendChild(row));
+        }
+
+        function filterTable() {
+            alert('Filter functionality would open a modal with advanced filtering options');
+        }
+
+        // Initialize dashboard
+        function init() {
+            updateStats();
+            populateTable();
+            drawDonutChart();
+            drawBarChart();
+            drawLineChart();
+
+            // Simulate real-time updates
+            setInterval(() => {
+                // Randomly update one stat
+                const stats = ['totalFlights', 'avgOccupancy'];
+                const randomStat = stats[Math.floor(Math.random() * stats.length)];
+                const element = document.getElementById(randomStat);
+                const currentValue = parseInt(element.textContent);
+                const change = Math.floor(Math.random() * 3) - 1;
+                const newValue = Math.max(0, currentValue + change);
+                
+                if (randomStat === 'avgOccupancy') {
+                    element.textContent = Math.min(100, newValue) + '%';
+                } else {
+                    element.textContent = newValue;
+                }
+            }, 5000);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            drawLineChart();
+        });
+
+        // Start the dashboard
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
