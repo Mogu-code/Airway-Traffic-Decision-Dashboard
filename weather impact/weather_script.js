@@ -57,22 +57,39 @@ const windData = [
     { airport: 'ATL', speed: 12, direction: 90 },
     { airport: 'DFW', speed: 18, direction: 135 },
     { airport: 'DEN', speed: 32, direction: 315 },
+    { airport: 'SFO', speed: 25, direction: 225 },
+    { airport: 'SEA', speed: 20, direction: 180 },
+    { airport: 'MIA', speed: 16, direction: 90 },
+    { airport: 'BOS', speed: 19, direction: 45 },
+    { airport: 'PHX', speed: 14, direction: 270 },
+    { airport: 'LHR', speed: 23, direction: 315 },
 ];
 
-const temperatureData = [
-    { temp: -10, delays: 45 },
-    { temp: 0, delays: 35 },
-    { temp: 10, delays: 20 },
-    { temp: 20, delays: 10 },
-    { temp: 30, delays: 8 },
-    { temp: 40, delays: 12 },
-    { temp: 50, delays: 18 },
-    { temp: 60, delays: 5 },
-    { temp: 70, delays: 3 },
-    { temp: 80, delays: 8 },
-    { temp: 90, delays: 15 },
-    { temp: 100, delays: 35 },
+const precipitationData = [
+    { hour: '00:00', precip: 0, ceiling: 8000 },
+    { hour: '03:00', precip: 0.1, ceiling: 6500 },
+    { hour: '06:00', precip: 0.3, ceiling: 4000 },
+    { hour: '09:00', precip: 0.5, ceiling: 3000 },
+    { hour: '12:00', precip: 0.8, ceiling: 2500 },
+    { hour: '15:00', precip: 0.6, ceiling: 3500 },
+    { hour: '18:00', precip: 0.2, ceiling: 5000 },
+    { hour: '21:00', precip: 0, ceiling: 7500 },
+    { hour: '24:00', precip: 0, ceiling: 8500 },
 ];
+
+const runwayConditions = [
+    { runway: 'Runway 27L', status: 'Open', condition: 'Good', friction: 0.85, visibility: 10, surface: 'Dry' },
+    { runway: 'Runway 27R', status: 'Open', condition: 'Good', friction: 0.82, visibility: 10, surface: 'Dry' },
+    { runway: 'Runway 09L', status: 'Limited', condition: 'Fair', friction: 0.65, visibility: 5, surface: 'Wet' },
+    { runway: 'Runway 09R', status: 'Closed', condition: 'Poor', friction: 0.35, visibility: 2, surface: 'Icy' },
+];
+
+const currentConditions = {
+    windSpeed: 15,
+    humidity: 65,
+    visibility: 10,
+    pressure: 29.92,
+};
 
 // Populate Weather Table
 function populateWeatherTable() {
@@ -265,9 +282,9 @@ function drawTrendChart() {
     }
 }
 
-// Draw Temperature Chart
-function drawTempChart() {
-    const canvas = document.getElementById('tempChart');
+// Draw Precipitation Chart
+function drawPrecipChart() {
+    const canvas = document.getElementById('precipChart');
     const ctx = canvas.getContext('2d');
     
     canvas.width = canvas.offsetWidth;
@@ -299,23 +316,31 @@ function drawTempChart() {
     ctx.lineTo(canvas.width - padding, canvas.height - padding);
     ctx.stroke();
 
-    // Create gradient for line
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-    gradient.addColorStop(0, '#4de5c3');
-    gradient.addColorStop(0.5, '#ffab40');
-    gradient.addColorStop(1, '#ff5252');
+    // Draw bars for precipitation
+    const barWidth = width / (precipitationData.length * 2);
+    const maxPrecip = Math.max(...precipitationData.map(d => d.precip));
 
-    // Draw line
-    const maxValue = Math.max(...temperatureData.map(d => d.delays));
-    const xStep = width / (temperatureData.length - 1);
+    precipitationData.forEach((point, index) => {
+        const barHeight = (point.precip / (maxPrecip * 1.1)) * height;
+        const x = padding + (index * width) / precipitationData.length + barWidth / 2;
+        const y = canvas.height - padding - barHeight;
 
-    ctx.strokeStyle = gradient;
+        // Draw bar
+        ctx.fillStyle = '#4de5c3';
+        ctx.fillRect(x, y, barWidth, barHeight);
+    });
+
+    // Draw ceiling line
+    const maxCeiling = Math.max(...precipitationData.map(d => d.ceiling));
+    const xStep = width / (precipitationData.length - 1);
+
+    ctx.strokeStyle = '#ffab40';
     ctx.lineWidth = 3;
     ctx.beginPath();
 
-    temperatureData.forEach((point, index) => {
+    precipitationData.forEach((point, index) => {
         const x = padding + index * xStep;
-        const y = canvas.height - padding - (point.delays / (maxValue * 1.1)) * height;
+        const y = canvas.height - padding - (point.ceiling / (maxCeiling * 1.1)) * height;
 
         if (index === 0) {
             ctx.moveTo(x, y);
@@ -326,38 +351,104 @@ function drawTempChart() {
 
     ctx.stroke();
 
-    // Draw points
-    temperatureData.forEach((point, index) => {
+    // Draw points for ceiling
+    precipitationData.forEach((point, index) => {
         const x = padding + index * xStep;
-        const y = canvas.height - padding - (point.delays / (maxValue * 1.1)) * height;
+        const y = canvas.height - padding - (point.ceiling / (maxCeiling * 1.1)) * height;
 
-        ctx.fillStyle = '#3dd5b3';
+        ctx.fillStyle = '#ffab40';
         ctx.beginPath();
         ctx.arc(x, y, 4, 0, 2 * Math.PI);
         ctx.fill();
     });
 
-    // Draw labels (every other temp)
+    // Draw labels
     ctx.fillStyle = '#8e9aaf';
     ctx.font = '11px Segoe UI';
     ctx.textAlign = 'center';
 
-    temperatureData.forEach((point, index) => {
-        if (index % 2 === 0) {
-            const x = padding + index * xStep;
-            ctx.fillText(point.temp + '°F', x, canvas.height - padding + 20);
-        }
+    precipitationData.forEach((point, index) => {
+        const x = padding + index * xStep;
+        ctx.fillText(point.hour, x, canvas.height - padding + 20);
     });
 
-    // Draw Y-axis labels
+    // Draw Y-axis labels (left side - precipitation)
     ctx.textAlign = 'right';
+    ctx.fillStyle = '#4de5c3';
     for (let i = 0; i <= 4; i++) {
-        const value = Math.round((maxValue / 4) * (4 - i));
+        const value = ((maxPrecip / 4) * (4 - i)).toFixed(1);
         const y = padding + (height / 4) * i;
-        ctx.fillText(value + '%', padding - 10, y + 4);
+        ctx.fillText(value + '"', padding - 10, y + 4);
     }
+
+    // Draw Y-axis labels (right side - ceiling)
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#ffab40';
+    for (let i = 0; i <= 4; i++) {
+        const value = Math.round((maxCeiling / 4) * (4 - i));
+        const y = padding + (height / 4) * i;
+        ctx.fillText(value + 'ft', canvas.width - padding + 10, y + 4);
+    }
+
+    // Draw legend
+    ctx.textAlign = 'left';
+    ctx.font = '12px Segoe UI';
+    
+    ctx.fillStyle = '#4de5c3';
+    ctx.fillRect(padding + 10, 15, 15, 15);
+    ctx.fillStyle = '#fff';
+    ctx.fillText('Precipitation', padding + 30, 27);
+    
+    ctx.fillStyle = '#ffab40';
+    ctx.fillRect(padding + 140, 15, 15, 15);
+    ctx.fillStyle = '#fff';
+    ctx.fillText('Ceiling Height', padding + 160, 27);
 }
 
+// Populate Runway Conditions
+function populateRunways() {
+    const container = document.getElementById('runwayGrid');
+    container.innerHTML = '';
+
+    runwayConditions.forEach(runway => {
+        const statusClass = runway.status === 'Open' ? 'status-open' : 
+                           runway.status === 'Limited' ? 'status-limited' : 'status-closed';
+        
+        const conditionClass = runway.condition === 'Good' ? 'condition-good' : 
+                              runway.condition === 'Fair' ? 'condition-fair' : 'condition-poor';
+        
+        const frictionPercent = Math.round(runway.friction * 100);
+
+        const runwayItem = document.createElement('div');
+        runwayItem.className = 'runway-item';
+        runwayItem.innerHTML = `
+            <div class="runway-header">
+                <div class="runway-name">${runway.runway}</div>
+                <div class="runway-status ${statusClass}">${runway.status}</div>
+            </div>
+            <div class="runway-details">
+                <div class="runway-detail">
+                    <span class="runway-detail-label">Surface:</span>
+                    <span class="runway-detail-value">${runway.surface}</span>
+                </div>
+                <div class="runway-detail">
+                    <span class="runway-detail-label">Visibility:</span>
+                    <span class="runway-detail-value">${runway.visibility} mi</span>
+                </div>
+                <div class="runway-detail">
+                    <span class="runway-detail-label">Friction Coefficient:</span>
+                    <span class="runway-detail-value">${runway.friction}</span>
+                </div>
+                <div class="runway-condition-bar">
+                    <div class="runway-condition-fill ${conditionClass}" style="width: ${frictionPercent}%"></div>
+                </div>
+            </div>
+        `;
+        container.appendChild(runwayItem);
+    });
+}
+
+// Update Current Conditions Display
 // Populate Forecast
 function populateForecast() {
     const container = document.getElementById('forecastContainer');
@@ -412,12 +503,16 @@ function refreshChart(type) {
     const charts = {
         'weather-bar': drawWeatherBarChart,
         'trend': drawTrendChart,
-        'temp': drawTempChart,
-        'wind': populateWindGrid
+        'wind': populateWindGrid,
+        'precip': drawPrecipChart
     };
     if (charts[type]) {
         charts[type]();
     }
+}
+
+function refreshRunways() {
+    populateRunways();
 }
 
 function refreshForecast() {
@@ -515,9 +610,10 @@ function init() {
     populateWeatherTable();
     drawWeatherBarChart();
     drawTrendChart();
-    drawTempChart();
+    drawPrecipChart();
     populateForecast();
     populateWindGrid();
+    populateRunways();
 
     // Simulate real-time updates
     setInterval(() => {
@@ -526,6 +622,10 @@ function init() {
         weatherImpactData[randomIndex].probability = Math.max(0, Math.min(100, 
             weatherImpactData[randomIndex].probability + (Math.random() - 0.5) * 10));
         populateWeatherTable();
+        
+        // Update wind speeds
+        currentConditions.windSpeed = Math.max(0, currentConditions.windSpeed + (Math.random() - 0.5) * 3);
+        currentConditions.humidity = Math.max(0, Math.min(100, currentConditions.humidity + (Math.random() - 0.5) * 5));
     }, 8000);
 
     // Update wind directions
@@ -541,7 +641,7 @@ function init() {
 window.addEventListener('resize', () => {
     drawWeatherBarChart();
     drawTrendChart();
-    drawTempChart();
+    drawPrecipChart();
 });
 
 // Navigation functionality
