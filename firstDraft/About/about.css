@@ -1,16 +1,8 @@
-/* ============================================
-   ABOUT PAGE STYLES
-   ============================================ */
-
 .about-container {
     padding: var(--spacing-xl);
     max-width: 1400px;
     margin: 0 auto;
 }
-
-/* ============================================
-   HERO SECTION
-   ============================================ */
 
 .about-hero {
     text-align: center;
@@ -42,7 +34,7 @@
     align-items: center;
     justify-content: center;
     background: var(--accent-cyan-light);
-    border-radius: var(--radius-lg);
+    border-radius: 50%;
     color: var(--accent-cyan);
     animation: fadeIn 0.8s ease;
 }
@@ -69,10 +61,6 @@
     margin: 0 auto;
     animation: fadeInUp 0.8s ease 0.2s both;
 }
-
-/* ============================================
-   SECTION STYLES
-   ============================================ */
 
 .about-section {
     margin-bottom: var(--spacing-2xl);
@@ -114,10 +102,6 @@
     line-height: 1.8;
     color: var(--text-secondary);
 }
-
-/* ============================================
-   TECHNOLOGY GRID
-   ============================================ */
 
 .tech-grid {
     display: grid;
@@ -166,7 +150,7 @@
     align-items: center;
     justify-content: center;
     background: var(--accent-cyan-light);
-    border-radius: var(--radius-md);
+    border-radius: 50%;
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--accent-cyan);
@@ -184,10 +168,6 @@
     font-size: 0.9375rem;
     color: var(--text-secondary);
 }
-
-/* ============================================
-   FUTURE SCOPE GRID
-   ============================================ */
 
 .future-grid {
     display: grid;
@@ -216,7 +196,7 @@
     align-items: center;
     justify-content: center;
     background: var(--accent-cyan-light);
-    border-radius: var(--radius-md);
+    border-radius: 50%;
     color: var(--accent-cyan);
     margin-bottom: var(--spacing-lg);
 }
@@ -238,10 +218,6 @@
     color: var(--text-secondary);
     line-height: 1.6;
 }
-
-/* ============================================
-   TEAM GRID
-   ============================================ */
 
 .team-grid {
     display: grid;
@@ -310,10 +286,6 @@
     color: var(--text-secondary);
 }
 
-/* ============================================
-   ARCHITECTURE CARD
-   ============================================ */
-
 .architecture-card {
     background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
     padding: var(--spacing-2xl);
@@ -340,7 +312,7 @@
     align-items: center;
     justify-content: center;
     background: var(--accent-cyan-light);
-    border-radius: var(--radius-md);
+    border-radius: 50%;
     color: var(--accent-cyan);
     margin-bottom: var(--spacing-lg);
 }
@@ -363,10 +335,6 @@
     color: var(--text-secondary);
 }
 
-/* ============================================
-   FOOTER
-   ============================================ */
-
 .about-footer {
     text-align: center;
     padding: var(--spacing-xl) 0;
@@ -378,10 +346,6 @@
     font-size: 0.875rem;
     color: var(--text-muted);
 }
-
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
 
 @media (max-width: 768px) {
     .hero-title {
@@ -395,7 +359,6 @@
     .section-title {
         font-size: 1.5rem;
     }
-
     .tech-grid,
     .future-grid,
     .team-grid {
@@ -410,3 +373,4 @@
         padding: var(--spacing-xl);
     }
 }
+

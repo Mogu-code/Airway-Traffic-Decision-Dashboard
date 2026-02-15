@@ -6,10 +6,11 @@
     <title>About - AirTraffic Dashboard</title>
     <link rel="stylesheet" href="../Overview/styles.css">
     <link rel="stylesheet" href="../Overview/sidebar.css">
+    <link rel="stylesheet" href="../Overview/dashboard.css">
     <link rel="stylesheet" href="about.css">
 </head>
 <body>
-    <!-- Sidebar Navigation -->
+ 
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo">
@@ -65,8 +66,8 @@
 
             <a href="about.html" class="nav-item active">
                 <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
                 <span>About</span>
             </a>
@@ -77,9 +78,8 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Top Header -->
+    <main class="main-content about-page">
+
         <header class="top-header">
             <div class="header-left">
                 <button class="collapse-btn" aria-label="Toggle Sidebar">
@@ -131,9 +131,8 @@
             </div>
         </header>
 
-        <!-- About Content -->
         <div class="about-container">
-            <!-- Hero Section -->
+
             <section class="about-hero">
                 <div class="hero-icon">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -143,26 +142,24 @@
                 </div>
                 <h1 class="hero-title">Airway Traffic Decision Dashboard</h1>
                 <p class="hero-description">
-                    A comprehensive frontend prototype designed for visualizing airway traffic data, 
-                    including airport congestion, flight delays & cancellations, aircraft traffic patterns, 
-                    and weather impact indicators.
+                    A frontend prototype dashboard interface designed to visualize airway traffic concepts, 
+                    including airport congestion metrics, flight delays & cancellations data, aircraft traffic patterns, 
+                    and weather impact displays using static mockup data.
                 </p>
             </section>
 
-            <!-- Project Objective -->
             <section class="about-section">
                 <h2 class="section-title">Project Objective</h2>
                 <div class="section-content">
                     <p>
-                        This dashboard serves as a decision-support tool for air traffic controllers and aviation managers. 
-                        It provides real-time visibility into flight operations, helping identify congestion patterns, predict delays, 
-                        and understand weather impacts on flight schedules. The modular architecture is designed for easy integration 
-                        with backend APIs and real-time data sources.
+                        This dashboard prototype demonstrates the user interface and visualization concepts for an air traffic 
+                        management system. It showcases various dashboard layouts, data presentation formats, and interactive 
+                        elements that could be used by air traffic controllers and aviation managers. The project focuses on 
+                        frontend design and user experience, using static data to simulate real-world scenarios.
                     </p>
                 </div>
             </section>
 
-            <!-- Technologies Used -->
             <section class="about-section">
                 <h2 class="section-title">Technologies Used</h2>
                 <div class="tech-grid">
@@ -184,13 +181,12 @@
                 </div>
             </section>
 
-            <!-- Future Scope -->
             <section class="about-section">
                 <h2 class="section-title">
                     <svg class="title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/>
                     </svg>
-                    Future Scope
+                    Future Enhancements
                 </h2>
                 <div class="future-grid">
                     <div class="future-card">
@@ -200,8 +196,8 @@
                                 <path d="M3 9h18M9 3v18" stroke="currentColor" stroke-width="2"/>
                             </svg>
                         </div>
-                        <h3>Real-time API Integration</h3>
-                        <p>Connect to live flight data APIs for real-time monitoring</p>
+                        <h3>Backend Integration</h3>
+                        <p>Connect to real-time flight data APIs and databases</p>
                     </div>
                     <div class="future-card">
                         <div class="future-icon">
@@ -210,8 +206,8 @@
                                 <path d="M12 3C8 10 8 14 12 21" stroke="currentColor" stroke-width="2"/>
                             </svg>
                         </div>
-                        <h3>Weather API Integration</h3>
-                        <p>Integrate with weather services for accurate predictions</p>
+                        <h3>Live Weather Data</h3>
+                        <p>Integration with weather services for real-time updates</p>
                     </div>
                     <div class="future-card">
                         <div class="future-icon">
@@ -220,7 +216,7 @@
                             </svg>
                         </div>
                         <h3>Predictive Analytics</h3>
-                        <p>Machine learning models for delay prediction</p>
+                        <p>Machine learning models for delay and congestion prediction</p>
                     </div>
                     <div class="future-card">
                         <div class="future-icon">
@@ -230,13 +226,12 @@
                                 <path d="M13 11l-4 4" stroke="currentColor" stroke-width="2"/>
                             </svg>
                         </div>
-                        <h3>Multi-user Support</h3>
-                        <p>Role-based access control for different user types</p>
+                        <h3>User Authentication</h3>
+                        <p>Role-based access control and user management system</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Team Members -->
             <section class="about-section">
                 <h2 class="section-title">Team Members</h2>
                 <div class="team-grid">
@@ -258,7 +253,6 @@
                 </div>
             </section>
 
-            <!-- API Architecture -->
             <section class="about-section">
                 <div class="architecture-card">
                     <div class="architecture-icon">
@@ -267,19 +261,18 @@
                             <path d="M3 9h18M9 3v18" stroke="currentColor" stroke-width="2"/>
                         </svg>
                     </div>
-                    <h2>API-Ready Architecture</h2>
+                    <h2>Current Implementation</h2>
                     <p>
-                        This dashboard is built with a clean separation between data and UI layers. All data is currently 
-                        loaded from TypeScript data files that simulate API responses. To integrate with real backend APIs, 
-                        simply replace the data imports with fetch() calls to your API endpoints. The component structure 
-                        will remain unchanged.
+                        This is a static frontend prototype built using HTML, CSS, and JavaScript. All displayed data is 
+                        currently hardcoded or generated using mock data structures. The dashboard demonstrates the visual 
+                        design, layout concepts, and user interface interactions. Future development phases will include 
+                        backend API integration, database connectivity, and real-time data processing capabilities.
                     </p>
                 </div>
             </section>
 
-            <!-- Footer -->
             <footer class="about-footer">
-                <p>© 2025 Airway Traffic Decision Dashboard. Built for academic evaluation and future backend integration.</p>
+                <p>© 2025 Airway Traffic Decision Dashboard. A frontend prototype project for academic evaluation.</p>
             </footer>
         </div>
     </main>
