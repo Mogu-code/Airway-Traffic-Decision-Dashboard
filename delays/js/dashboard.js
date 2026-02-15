@@ -390,27 +390,87 @@ function initializeCharts() {
 // FILTER FUNCTIONALITY
 // ==========================================
 function initializeFilters() {
-    const filterSelects = document.querySelectorAll('.filter-select');
+    const airlineFilter = document.getElementById('airlineFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const delayFilter = document.getElementById('delayFilter');
     
-    filterSelects.forEach(select => {
-        select.addEventListener('change', function() {
-            console.log(`Filter changed: ${this.value}`);
-            // Add filter logic here
-            applyFilters();
-        });
-    });
+    if (airlineFilter) {
+        airlineFilter.addEventListener('change', applyFilters);
+    }
+    if (statusFilter) {
+        statusFilter.addEventListener('change', applyFilters);
+    }
+    if (delayFilter) {
+        delayFilter.addEventListener('change', applyFilters);
+    }
 }
 
 function applyFilters() {
     // Get current filter values
-    const airline = document.querySelector('.filter-select:nth-of-type(1)')?.value || 'All Airlines';
-    const status = document.querySelector('.filter-select:nth-of-type(2)')?.value || 'All Status';
-    const minDelay = document.querySelector('.filter-select:nth-of-type(3)')?.value || 'Any delay';
+    const airlineValue = document.getElementById('airlineFilter')?.value || 'all';
+    const statusValue = document.getElementById('statusFilter')?.value || 'all';
+    const delayValue = parseInt(document.getElementById('delayFilter')?.value || '0');
     
-    console.log('Applying filters:', { airline, status, minDelay });
+    console.log('Applying filters:', { airlineValue, statusValue, delayValue });
     
-    // Filter logic would go here
-    // This would typically update the charts and flight list
+    // Filter the flight data
+    const filteredFlights = dashboardFlights.filter(flight => {
+        // Airline filter
+        const airlineMatch = airlineValue === 'all' || flight.airline === airlineValue;
+        
+        // Status filter
+        const statusMatch = statusValue === 'all' || flight.status === statusValue;
+        
+        // Delay filter
+        let delayMatch = true;
+        if (delayValue > 0 && flight.delay) {
+            const flightDelayMinutes = parseInt(flight.delay.replace(/\D/g, ''));
+            delayMatch = flightDelayMinutes >= delayValue;
+        } else if (delayValue > 0 && !flight.delay) {
+            delayMatch = false; // Flight has no delay but filter requires minimum delay
+        }
+        
+        return airlineMatch && statusMatch && delayMatch;
+    });
+    
+    console.log('Filtered results:', filteredFlights.length, 'flights');
+    
+    // Update the table with filtered data
+    updateTable(filteredFlights);
+}
+
+function updateTable(flights) {
+    const tableBody = document.getElementById('dashboardFlightsTable');
+    
+    if (!tableBody) {
+        console.log('Dashboard table not found');
+        return;
+    }
+    
+    // Clear existing rows
+    tableBody.innerHTML = '';
+    
+    // If no flights match, show message
+    if (flights.length === 0) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 7;
+        cell.style.textAlign = 'center';
+        cell.style.padding = '2rem';
+        cell.style.color = 'var(--text-secondary)';
+        cell.textContent = 'No flights match the selected filters';
+        row.appendChild(cell);
+        tableBody.appendChild(row);
+        return;
+    }
+    
+    // Populate with filtered flight data
+    flights.forEach((flight, index) => {
+        const row = createFlightRow(flight, index);
+        tableBody.appendChild(row);
+    });
+    
+    console.log(`Updated table with ${flights.length} flights`);
 }
 
 // ==========================================
