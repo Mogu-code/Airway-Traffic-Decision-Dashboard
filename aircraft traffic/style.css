@@ -127,24 +127,29 @@ body {
 }
 
 .icon-btn {
-    background: #252d3d;
-    border: none;
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    cursor: pointer;
+    position: relative;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #8e9aaf;
-    transition: all 0.3s;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-base);
 }
 
 .icon-btn:hover {
-    background: #2f3947;
-    color: #fff;
+    background: var(--bg-hover);
+    color: var(--accent-cyan);
+    border-color: var(--accent-cyan);
 }
-
+.icon-btn svg {
+    width: 20px;
+    height: 20px;
+}
 .user-profile {
     display: flex;
     align-items: center;
