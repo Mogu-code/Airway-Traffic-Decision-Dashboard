@@ -18,12 +18,7 @@ body {
 
 /* Sidebar */
 .sidebar {
-    width: 220px;
-    background: #1a1f2e;
-    padding: 20px 0;
-    position: fixed;
-    height: 100vh;
-    overflow-y: auto;
+    display: none;
 }
 
 .logo {
@@ -70,9 +65,14 @@ body {
 
 /* Main Content */
 .main-content {
-    margin-left: 220px;
+    margin-left: 0;
     flex: 1;
     padding: 0;
+    width: 100%;
+}
+
+.main-content.full-width {
+    margin-left: 0;
 }
 
 /* Header */
@@ -633,14 +633,6 @@ select:focus {
 }
 
 @media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
-    
-    .main-content {
-        margin-left: 0;
-    }
-
     .stats-grid {
         grid-template-columns: 1fr;
     }
