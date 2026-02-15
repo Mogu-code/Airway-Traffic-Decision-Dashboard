@@ -97,34 +97,35 @@
         <div class="filters-container">
             <div class="filter-group">
                 <label class="filter-label">Airline</label>
-                <select class="filter-select">
-                    <option>All Airlines</option>
-                    <option>American Airlines</option>
-                    <option>United Airlines</option>
-                    <option>Delta Airlines</option>
-                    <option>Southwest</option>
-                    <option>British Airways</option>
-                    <option>JetBlue</option>
+                <select class="filter-select" id="airlineFilter">
+                    <option value="all">All Airlines</option>
+                    <option value="American Airlines">American Airlines</option>
+                    <option value="United Airlines">United Airlines</option>
+                    <option value="Delta Airlines">Delta Airlines</option>
+                    <option value="Southwest">Southwest</option>
+                    <option value="British Airways">British Airways</option>
+                    <option value="JetBlue">JetBlue</option>
+                    <option value="FedEx">FedEx</option>
                 </select>
             </div>
 
             <div class="filter-group">
                 <label class="filter-label">Status</label>
-                <select class="filter-select">
-                    <option>All Status</option>
-                    <option>On Time</option>
-                    <option>Delayed</option>
-                    <option>Cancelled</option>
+                <select class="filter-select" id="statusFilter">
+                    <option value="all">All Status</option>
+                    <option value="On Time">On Time</option>
+                    <option value="Delayed">Delayed</option>
+                    <option value="Cancelled">Cancelled</option>
                 </select>
             </div>
 
             <div class="filter-group">
                 <label class="filter-label">Minimum Delay</label>
-                <select class="filter-select">
-                    <option>Any delay</option>
-                    <option>15+ minutes</option>
-                    <option>30+ minutes</option>
-                    <option>60+ minutes</option>
+                <select class="filter-select" id="delayFilter">
+                    <option value="0">Any delay</option>
+                    <option value="15">15+ minutes</option>
+                    <option value="30">30+ minutes</option>
+                    <option value="60">60+ minutes</option>
                 </select>
             </div>
         </div>
