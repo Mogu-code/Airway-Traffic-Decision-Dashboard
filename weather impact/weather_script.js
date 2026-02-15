@@ -50,21 +50,6 @@ const forecast48h = [
     { time: '+48h', temp: 64, condition: 'Rain', icon: '🌧️', wind: 14, humidity: 78 },
 ];
 
-const windData = [
-    { airport: 'JFK', speed: 15, direction: 45 },
-    { airport: 'LAX', speed: 22, direction: 180 },
-    { airport: 'ORD', speed: 28, direction: 270 },
-    { airport: 'ATL', speed: 12, direction: 90 },
-    { airport: 'DFW', speed: 18, direction: 135 },
-    { airport: 'DEN', speed: 32, direction: 315 },
-    { airport: 'SFO', speed: 25, direction: 225 },
-    { airport: 'SEA', speed: 20, direction: 180 },
-    { airport: 'MIA', speed: 16, direction: 90 },
-    { airport: 'BOS', speed: 19, direction: 45 },
-    { airport: 'PHX', speed: 14, direction: 270 },
-    { airport: 'LHR', speed: 23, direction: 315 },
-];
-
 const precipitationData = [
     { hour: '00:00', precip: 0, ceiling: 8000 },
     { hour: '03:00', precip: 0.1, ceiling: 6500 },
@@ -472,38 +457,11 @@ function populateForecast() {
 }
 
 // Populate Wind Grid
-function populateWindGrid() {
-    const container = document.getElementById('windGrid');
-    container.innerHTML = '';
-
-    windData.forEach(item => {
-        const windItem = document.createElement('div');
-        windItem.className = 'wind-item';
-        windItem.innerHTML = `
-            <div class="wind-airport">${item.airport}</div>
-            <div class="wind-compass">
-                <div class="wind-arrow" style="transform: rotate(${item.direction}deg) translateY(-20px);"></div>
-            </div>
-            <div class="wind-speed">${item.speed} mph</div>
-            <div class="wind-direction">${getWindDirection(item.direction)}</div>
-        `;
-        container.appendChild(windItem);
-    });
-}
-
-// Get wind direction name
-function getWindDirection(degrees) {
-    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    const index = Math.round(degrees / 45) % 8;
-    return directions[index];
-}
-
 // Utility functions
 function refreshChart(type) {
     const charts = {
         'weather-bar': drawWeatherBarChart,
         'trend': drawTrendChart,
-        'wind': populateWindGrid,
         'precip': drawPrecipChart
     };
     if (charts[type]) {
@@ -612,7 +570,6 @@ function init() {
     drawTrendChart();
     drawPrecipChart();
     populateForecast();
-    populateWindGrid();
     populateRunways();
 
     // Simulate real-time updates
@@ -622,19 +579,7 @@ function init() {
         weatherImpactData[randomIndex].probability = Math.max(0, Math.min(100, 
             weatherImpactData[randomIndex].probability + (Math.random() - 0.5) * 10));
         populateWeatherTable();
-        
-        // Update wind speeds
-        currentConditions.windSpeed = Math.max(0, currentConditions.windSpeed + (Math.random() - 0.5) * 3);
-        currentConditions.humidity = Math.max(0, Math.min(100, currentConditions.humidity + (Math.random() - 0.5) * 5));
     }, 8000);
-
-    // Update wind directions
-    setInterval(() => {
-        windData.forEach(wind => {
-            wind.direction = (wind.direction + Math.random() * 10 - 5 + 360) % 360;
-        });
-        populateWindGrid();
-    }, 5000);
 }
 
 // Handle window resize

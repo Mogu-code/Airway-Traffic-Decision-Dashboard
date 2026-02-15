@@ -85,24 +85,22 @@ body {
 }
 
 .icon-btn {
-    position: relative;
-    width: 40px;
-    height: 40px;
+    background: #252d3d;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-md);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all var(--transition-base);
+    color: #8e9aaf;
+    transition: all 0.3s;
 }
 
 .icon-btn:hover {
-    background: var(--bg-hover);
-    color: var(--accent-cyan);
-    border-color: var(--accent-cyan);
+    background: #2f3947;
+    color: #fff;
 }
 .icon-btn svg {
     width: 20px;
