@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airport Congestion - Real-time Airway Traffic Monitoring</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/airport-congestion.css">
+    <link rel="stylesheet" href="../shared.css">
+    <link rel="stylesheet" href="../sidebar.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 16V8C21 7.45 20.55 7 20 7H15L12.59 4.59C12.21 4.21 11.7 4 11.17 4H4C3.45 4 3 4.45 3 5V19C3 19.55 3.45 20 4 20H20C20.55 20 21 19.55 21 19V17.5" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 9L17 12L12 15V9Z" fill="currentColor"/>
+                </svg>
+                <span class="logo-text">AirTraffic</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="../firstDraft/Overview/index.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                    <rect x="3" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                    <rect x="13" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                    <rect x="13" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Overview</span>
+            </a>
+
+            <a href="airport_congestion.html" class="nav-item active">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 8h18M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8M3 8l3-5h12l3 5" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Airport Congestion</span>
+            </a>
+
+            <a href="../delays/index.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Delays & Cancellations</span>
+            </a>
+
+            <a href="../aircraft traffic/index.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Aircraft Traffic</span>
+            </a>
+
+            <a href="../weather impact/weather_index.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 15h18M9 9l-6 6 6 6" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 3C8 10 8 14 12 21" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Weather Impact</span>
+            </a>
+
+            <a href="../firstDraft/About/about.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>About</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <p>© 2025 AirTraffic Dashboard</p>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <!-- Page Header -->
+        <header class="top-header">
+            <div>
+                <h1 style="font-size:1.25rem;font-weight:600;color:var(--text-primary);">Airport Congestion</h1>
+                <p style="font-size:0.875rem;color:var(--text-secondary);">Real-time airway traffic monitoring</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:1rem;">
+                <div style="display:flex;align-items:center;gap:0.5rem;background:var(--bg-tertiary);border-radius:8px;padding:0.5rem 1rem;">
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <input type="text" class="search-input" placeholder="Search flights, airports..." style="background:none;border:none;outline:none;color:var(--text-primary);font-size:0.875rem;width:200px;">
+                </div>
+                <div class="user-menu" style="display:flex;align-items:center;gap:0.75rem;">
+                    <div style="width:36px;height:36px;background:var(--bg-tertiary);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size:0.875rem;font-weight:500;color:var(--text-primary);">Admin User</div>
+                        <div style="font-size:0.75rem;color:var(--text-secondary);">Controller</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="congestion-container">
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="filter-group">
+                <label class="filter-label">City</label>
+                <select class="filter-select" id="cityFilter">
+                    <option value="all">All Cities</option>
+                    <option value="atlanta">Atlanta</option>
+                    <option value="boston">Boston</option>
+                    <option value="chicago">Chicago</option>
+                    <option value="dallas">Dallas</option>
+                    <option value="denver">Denver</option>
+                    <option value="los angeles">Los Angeles</option>
+                    <option value="miami">Miami</option>
+                    <option value="new york">New York</option>
+                    <option value="phoenix">Phoenix</option>
+                    <option value="san francisco">San Francisco</option>
+                    <option value="seattle">Seattle</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Congestion Level</label>
+                <select class="filter-select" id="congestionFilter">
+                    <option value="all">All</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Top 5 Most Congested Airports Chart -->
+        <div class="chart-section">
+            <h2 class="section-title">Top 5 Most Congested Airports</h2>
+            <div class="horizontal-chart-card">
+                <div class="horizontal-chart-container">
+                    <canvas id="congestionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Airport Congestion Data Table -->
+        <div class="table-section">
+            <h2 class="section-title">Airport Congestion Data</h2>
+            
+            <div class="table-card">
+                <div class="table-wrapper">
+                    <table class="congestion-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Airport Name</th>
+                                <th>City</th>
+                                <th>Active Flights</th>
+                                <th>Congestion Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="congestionTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </div><!-- end congestion-container -->
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="js/airport-congestion.js"></script>
+</body>
+</html>

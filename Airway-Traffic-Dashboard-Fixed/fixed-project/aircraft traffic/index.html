@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aircraft Traffic & Density Dashboard</title>
+    <link rel="stylesheet" href="../shared.css">
+    <link rel="stylesheet" href="../sidebar.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 16V8C21 7.45 20.55 7 20 7H15L12.59 4.59C12.21 4.21 11.7 4 11.17 4H4C3.45 4 3 4.45 3 5V19C3 19.55 3.45 20 4 20H20C20.55 20 21 19.55 21 19V17.5" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 9L17 12L12 15V9Z" fill="currentColor"/>
+                    </svg>
+                    <span class="logo-text">AirTraffic</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="../firstDraft/Overview/index.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/><rect x="3" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/><rect x="13" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+                    <span>Overview</span>
+                </a>
+                <a href="../airport-congestion/airport_congestion.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><path d="M3 8h18M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8M3 8l3-5h12l3 5" stroke="currentColor" stroke-width="2"/></svg>
+                    <span>Airport Congestion</span>
+                </a>
+                <a href="../delays/index.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2"/></svg>
+                    <span>Delays &amp; Cancellations</span>
+                </a>
+                <a href="index.html" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12" stroke="currentColor" stroke-width="2"/></svg>
+                    <span>Aircraft Traffic</span>
+                </a>
+                <a href="../weather impact/weather_index.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><path d="M3 15h18M9 9l-6 6 6 6" stroke="currentColor" stroke-width="2"/><path d="M12 3C8 10 8 14 12 21" stroke="currentColor" stroke-width="2"/></svg>
+                    <span>Weather Impact</span>
+                </a>
+                <a href="../firstDraft/About/about.html" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg>
+                    <span>About</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>© 2025 AirTraffic Dashboard</p>
+            </div>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-title">
+                    <h1>Aircraft Traffic & Density</h1>
+                    <p>Real-time airway traffic monitoring</p>
+                </div>
+                <div class="header-actions">
+                    <div class="live-indicator">
+                        <span class="live-dot"></span>
+                        LIVE
+                    </div>
+                    <div class="search-box">
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                        <input type="text" placeholder="Search flights, airports...">
+                    </div>
+                    <button class="icon-btn theme-toggle" aria-label="Toggle Theme">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+                    <button class="icon-btn">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                        </svg>
+                    </button>
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">Admin User</div>
+                            <div class="user-role">Controller</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <label class="filter-label">Aircraft Type</label>
+                        <div class="select-wrapper">
+                            <select id="aircraftFilter">
+                                <option>All Types</option>
+                                <option>Narrow Body</option>
+                                <option>Wide Body</option>
+                                <option>Cargo</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Airline</label>
+                        <div class="select-wrapper">
+                            <select id="airlineFilter">
+                                <option>All Airlines</option>
+                                <option>American Airlines</option>
+                                <option>United Airlines</option>
+                                <option>Delta Airlines</option>
+                                <option>Southwest</option>
+                                <option>British Airways</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">Time Range</label>
+                        <div class="select-wrapper">
+                            <select id="timeFilter">
+                                <option>Last 24 Hours</option>
+                                <option>Last 7 Days</option>
+                                <option>Last 30 Days</option>
+                                <option>Custom Range</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label class="filter-label">&nbsp;</label>
+                        <button class="export-btn" onclick="exportData()">
+                            Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: rgba(61, 213, 179, 0.1); color: #3dd5b3;">
+                                ✈️
+                            </div>
+                            <div class="stat-change positive">↑ 12%</div>
+                        </div>
+                        <div class="stat-value" id="totalFlights">0</div>
+                        <div class="stat-label">Total Flights Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: rgba(76, 201, 107, 0.1); color: #4cc96b;">
+                                📊
+                            </div>
+                            <div class="stat-change positive">↑ 8%</div>
+                        </div>
+                        <div class="stat-value" id="avgOccupancy">0%</div>
+                        <div class="stat-label">Average Occupancy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: rgba(255, 171, 64, 0.1); color: #ffab40;">
+                                🌍
+                            </div>
+                            <div class="stat-change negative">↓ 3%</div>
+                        </div>
+                        <div class="stat-value" id="activeAirports">0</div>
+                        <div class="stat-label">Active Airports</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon" style="background: rgba(255, 82, 82, 0.1); color: #ff5252;">
+                                ⚡
+                            </div>
+                            <div class="stat-change positive">↑ 15%</div>
+                        </div>
+                        <div class="stat-value" id="peakTraffic">0</div>
+                        <div class="stat-label">Peak Traffic Hour</div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Aircraft Type Distribution -->
+                    <div class="card">
+                        <div class="card-title">
+                            <span>Aircraft Type Distribution</span>
+                            <div class="card-actions">
+                                <button class="card-action-btn" onclick="refreshChart('donut')">↻</button>
+                                <button class="card-action-btn" onclick="toggleFullscreen(this)">⛶</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="donutChart" class="donut-chart"></canvas>
+                        </div>
+                        <div class="chart-legend" id="donutLegend"></div>
+                    </div>
+
+                    <!-- Flights Per Airport -->
+                    <div class="card">
+                        <div class="card-title">
+                            <span>Flights Per Airport (Top 10)</span>
+                            <div class="card-actions">
+                                <button class="card-action-btn" onclick="refreshChart('bar')">↻</button>
+                                <button class="card-action-btn" onclick="toggleFullscreen(this)">⛶</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <div class="bar-chart" id="barChart"></div>
+                        </div>
+                    </div>
+
+                    <!-- Hourly Traffic Volume -->
+                    <div class="card full-width-card">
+                        <div class="card-title">
+                            <span>Hourly Traffic Volume</span>
+                            <div class="card-actions">
+                                <button class="card-action-btn" onclick="refreshChart('line')">↻</button>
+                                <button class="card-action-btn" onclick="toggleFullscreen(this)">⛶</button>
+                            </div>
+                        </div>
+                        <div class="line-chart-container">
+                            <canvas id="lineChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Aircraft Traffic Data Table -->
+                    <div class="card full-width-card">
+                        <div class="card-title">
+                            <span>Aircraft Traffic Data</span>
+                            <div class="card-actions">
+                                <button class="card-action-btn" onclick="sortTable()">⇅</button>
+                                <button class="card-action-btn" onclick="filterTable()">⚙</button>
+                            </div>
+                        </div>
+                        <table class="data-table" id="trafficTable">
+                            <thead>
+                                <tr>
+                                    <th>Aircraft Type</th>
+                                    <th>Airline</th>
+                                    <th>Number of Flights</th>
+                                    <th>Avg Occupancy</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
