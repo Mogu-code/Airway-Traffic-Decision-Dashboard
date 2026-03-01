@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airport Congestion - Real-time Airway Traffic Monitoring</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/airport-congestion.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <h1 class="nav-title">Airport Congestion</h1>
+            <p class="nav-subtitle">Real-time airway traffic monitoring</p>
+        </div>
+        <div class="nav-center">
+            <div class="search-container">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <input type="text" class="search-input" placeholder="Search flights, airports...">
+            </div>
+        </div>
+        <div class="nav-right">
+            <button class="theme-toggle" aria-label="Toggle theme">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M10 1v2M10 17v2M3.93 3.93l1.41 1.41M14.66 14.66l1.41 1.41M1 10h2M17 10h2M3.93 16.07l1.41-1.41M14.66 5.34l1.41-1.41" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+            <button class="notification-btn" aria-label="Notifications">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M15 6.5A5 5 0 0 0 5 6.5c0 5.5-2 7-2 7h14s-2-1.5-2-7zM11.73 17a2 2 0 0 1-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span class="notification-badge">3</span>
+            </button>
+            <div class="user-menu">
+                <div class="user-avatar">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">Admin User</span>
+                    <span class="user-role">Controller</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="congestion-container">
+        <!-- Filters -->
+        <div class="filters-container">
+            <div class="filter-group">
+                <label class="filter-label">City</label>
+                <select class="filter-select" id="cityFilter">
+                    <option value="all">All Cities</option>
+                    <option value="atlanta">Atlanta</option>
+                    <option value="boston">Boston</option>
+                    <option value="chicago">Chicago</option>
+                    <option value="dallas">Dallas</option>
+                    <option value="denver">Denver</option>
+                    <option value="los angeles">Los Angeles</option>
+                    <option value="miami">Miami</option>
+                    <option value="new york">New York</option>
+                    <option value="phoenix">Phoenix</option>
+                    <option value="san francisco">San Francisco</option>
+                    <option value="seattle">Seattle</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Congestion Level</label>
+                <select class="filter-select" id="congestionFilter">
+                    <option value="all">All</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Top 5 Most Congested Airports Chart -->
+        <div class="chart-section">
+            <h2 class="section-title">Top 5 Most Congested Airports</h2>
+            <div class="horizontal-chart-card">
+                <div class="horizontal-chart-container">
+                    <canvas id="congestionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Airport Congestion Data Table -->
+        <div class="table-section">
+            <h2 class="section-title">Airport Congestion Data</h2>
+            
+            <div class="table-card">
+                <div class="table-wrapper">
+                    <table class="congestion-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Airport Name</th>
+                                <th>City</th>
+                                <th>Active Flights</th>
+                                <th>Congestion Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="congestionTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="js/airport-congestion.js"></script>
+</body>
+</html>

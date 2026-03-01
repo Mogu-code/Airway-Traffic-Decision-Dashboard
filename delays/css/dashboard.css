@@ -1,0 +1,523 @@
+/* ==========================================
+   DASHBOARD CONTAINER
+   ========================================== */
+.dashboard-container {
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* ==========================================
+   STATS CARDS
+   ========================================== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    transition: transform 0.3s ease;
+    transform: scaleX(0);
+    transform-origin: left;
+}
+
+.stat-card:hover::before {
+    transform: scaleX(1);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card.delayed::before {
+    background-color: var(--color-warning);
+}
+
+.stat-card.cancelled::before {
+    background-color: var(--color-danger);
+}
+
+.stat-card.average::before {
+    background-color: var(--color-info);
+}
+
+.stat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.stat-label {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.8;
+}
+
+.stat-card.delayed .stat-icon {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--color-warning);
+}
+
+.stat-card.cancelled .stat-icon {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--color-danger);
+}
+
+.stat-card.average .stat-icon {
+    background-color: rgba(6, 182, 212, 0.1);
+    color: var(--color-info);
+}
+
+.stat-value {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.stat-footer {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* ==========================================
+   FILTERS SECTION
+   ========================================== */
+.filters-container {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.filter-select {
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239aa0a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 3rem;
+}
+
+.filter-select:hover {
+    border-color: var(--accent-primary);
+    background-color: var(--bg-tertiary);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ==========================================
+   CHARTS SECTION
+   ========================================== */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.chart-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.chart-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+}
+
+.chart-container {
+    position: relative;
+    height: 320px;
+    margin-bottom: 1.5rem;
+}
+
+.chart-container canvas {
+    max-height: 100%;
+}
+
+.chart-legend {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+}
+
+.legend-dot.on-time {
+    background-color: var(--color-success);
+}
+
+.legend-dot.delayed {
+    background-color: var(--color-warning);
+}
+
+.legend-dot.cancelled {
+    background-color: var(--color-danger);
+}
+
+.legend-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* ==========================================
+   FLIGHT TABLE SECTION
+   ========================================== */
+.table-section {
+    margin-top: 2rem;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.view-all-link {
+    color: var(--accent-primary);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.view-all-link:hover {
+    color: #2563eb;
+    transform: translateX(4px);
+}
+
+.table-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.flights-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+}
+
+.flights-table thead {
+    background-color: var(--bg-tertiary);
+}
+
+.flights-table th {
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.flights-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.flights-table tbody tr:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.flights-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.flights-table td {
+    padding: 1.25rem 1.5rem;
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+/* Flight Number Styling */
+.flight-number {
+    color: var(--accent-primary);
+    font-weight: 600;
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+}
+
+/* Airline Column */
+.flights-table td:nth-child(2) {
+    font-weight: 500;
+}
+
+/* Airport Codes */
+.airport-code {
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    background-color: var(--bg-tertiary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Scheduled Time */
+.scheduled-time {
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+}
+
+/* Delay Time */
+.delay-time {
+    color: var(--color-warning);
+    font-weight: 600;
+    font-family: var(--font-mono);
+}
+
+.delay-none {
+    color: var(--text-muted);
+}
+
+/* Status Column */
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    display: inline-block;
+    text-align: center;
+    min-width: 90px;
+}
+
+.status-on-time {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-delayed {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.status-cancelled {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+@media (max-width: 1024px) {
+    .dashboard-container {
+        padding: 1.5rem;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 1rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+    }
+    
+    .filters-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .filter-group {
+        min-width: 100%;
+    }
+    
+    .chart-card {
+        padding: 1.5rem;
+    }
+    
+    .chart-container {
+        height: 280px;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+    }
+    
+    .flights-table th,
+    .flights-table td {
+        padding: 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .flights-table th {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .flights-table th,
+    .flights-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+    
+    /* Hide less critical columns on small screens */
+    .flights-table th:nth-child(3),
+    .flights-table td:nth-child(3),
+    .flights-table th:nth-child(4),
+    .flights-table td:nth-child(4) {
+        display: none;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        min-width: 70px;
+    }
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+.stat-card {
+    animation: fadeIn 0.4s ease-out;
+}
+
+.stat-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.stat-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.stat-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.chart-card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.chart-card:nth-child(1) {
+    animation-delay: 0.4s;
+}
+
+.chart-card:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+.table-section {
+    animation: fadeIn 0.5s ease-out;
+    animation-delay: 0.6s;
+}
+
+.flights-table tbody tr {
+    animation: slideIn 0.3s ease-out;
+    opacity: 0;
+    animation-fill-mode: forwards;
+}

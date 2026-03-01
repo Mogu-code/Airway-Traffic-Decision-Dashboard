@@ -1,0 +1,330 @@
+/* ==========================================
+   CONGESTION CONTAINER
+   ========================================== */
+.congestion-container {
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* ==========================================
+   FILTERS SECTION
+   ========================================== */
+.filters-container {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.filter-select {
+    padding: 0.75rem 1rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239aa0a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 3rem;
+}
+
+.filter-select:hover {
+    border-color: var(--accent-primary);
+    background-color: var(--bg-tertiary);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ==========================================
+   CHART SECTION
+   ========================================== */
+.chart-section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+}
+
+.horizontal-chart-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.horizontal-chart-container {
+    position: relative;
+    height: 400px;
+}
+
+.horizontal-chart-container canvas {
+    max-height: 100%;
+}
+
+/* ==========================================
+   TABLE SECTION
+   ========================================== */
+.table-section {
+    margin-top: 3rem;
+}
+
+.table-card {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+/* ==========================================
+   CONGESTION TABLE
+   ========================================== */
+.congestion-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+}
+
+.congestion-table thead {
+    background-color: var(--bg-tertiary);
+}
+
+.congestion-table th {
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.congestion-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.congestion-table tbody tr:hover {
+    background-color: var(--bg-tertiary);
+}
+
+.congestion-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.congestion-table td {
+    padding: 1.25rem 1.5rem;
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+/* Airport Code Styling */
+.airport-code {
+    color: var(--accent-primary);
+    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    letter-spacing: 0.05em;
+}
+
+/* Airport Name Column */
+.congestion-table td:nth-child(2) {
+    font-weight: 500;
+}
+
+/* City Column */
+.congestion-table td:nth-child(3) {
+    color: var(--text-secondary);
+}
+
+/* Active Flights Column */
+.active-flights {
+    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+}
+
+/* Congestion Level Badges */
+.congestion-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    display: inline-block;
+    text-align: center;
+    min-width: 85px;
+    text-transform: capitalize;
+}
+
+.congestion-low {
+    background-color: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.congestion-medium {
+    background-color: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.congestion-high {
+    background-color: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+@media (max-width: 1024px) {
+    .congestion-container {
+        padding: 1.5rem;
+    }
+    
+    .horizontal-chart-container {
+        height: 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .congestion-container {
+        padding: 1rem;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+    }
+    
+    .filters-container {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .filter-group {
+        min-width: 100%;
+    }
+    
+    .horizontal-chart-card {
+        padding: 1.5rem;
+    }
+    
+    .horizontal-chart-container {
+        height: 300px;
+    }
+    
+    .congestion-table th,
+    .congestion-table td {
+        padding: 1rem;
+        font-size: 0.875rem;
+    }
+    
+    .congestion-table th {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .congestion-table th,
+    .congestion-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+    
+    /* Hide city column on very small screens */
+    .congestion-table th:nth-child(3),
+    .congestion-table td:nth-child(3) {
+        display: none;
+    }
+    
+    .congestion-badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        min-width: 70px;
+    }
+}
+
+/* ==========================================
+   ANIMATIONS
+   ========================================== */
+.chart-section {
+    animation: fadeIn 0.4s ease-out;
+    animation-delay: 0.2s;
+}
+
+.table-section {
+    animation: fadeIn 0.5s ease-out;
+    animation-delay: 0.4s;
+}
+
+.congestion-table tbody tr {
+    animation: slideIn 0.3s ease-out;
+    opacity: 0;
+    animation-fill-mode: forwards;
+}
+
+.congestion-table tbody tr:nth-child(1) { animation-delay: 0.5s; }
+.congestion-table tbody tr:nth-child(2) { animation-delay: 0.55s; }
+.congestion-table tbody tr:nth-child(3) { animation-delay: 0.6s; }
+.congestion-table tbody tr:nth-child(4) { animation-delay: 0.65s; }
+.congestion-table tbody tr:nth-child(5) { animation-delay: 0.7s; }
+.congestion-table tbody tr:nth-child(6) { animation-delay: 0.75s; }
+.congestion-table tbody tr:nth-child(7) { animation-delay: 0.8s; }
+.congestion-table tbody tr:nth-child(8) { animation-delay: 0.85s; }
+.congestion-table tbody tr:nth-child(9) { animation-delay: 0.9s; }
+.congestion-table tbody tr:nth-child(10) { animation-delay: 0.95s; }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
