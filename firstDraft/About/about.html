@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - AirTraffic Dashboard</title>
+    <link rel="stylesheet" href="../Overview/styles.css">
+    <link rel="stylesheet" href="../Overview/sidebar.css">
+    <link rel="stylesheet" href="../Overview/dashboard.css">
+    <link rel="stylesheet" href="about.css">
+</head>
+<body>
+ 
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 16V8C21 7.45 20.55 7 20 7H15L12.59 4.59C12.21 4.21 11.7 4 11.17 4H4C3.45 4 3 4.45 3 5V19C3 19.55 3.45 20 4 20H20C20.55 20 21 19.55 21 19V17.5" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 9L17 12L12 15V9Z" fill="currentColor"/>
+                </svg>
+                <span class="logo-text">AirTraffic</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="../Overview/index.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                    <rect x="3" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                    <rect x="13" y="3" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                    <rect x="13" y="13" width="8" height="8" rx="1" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Overview</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 8h18M3 8v10a2 2 0 002 2h14a2 2 0 002-2V8M3 8l3-5h12l3 5" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Airport Congestion</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Delays & Cancellations</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Aircraft Traffic</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 15h18M9 9l-6 6 6 6" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 3C8 10 8 14 12 21" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span>Weather Impact</span>
+            </a>
+
+            <a href="about.html" class="nav-item active">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>About</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <p>© 2025 AirTraffic Dashboard</p>
+        </div>
+    </aside>
+
+    <main class="main-content about-page">
+
+        <header class="top-header">
+            <div class="header-left">
+                <button class="collapse-btn" aria-label="Toggle Sidebar">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+                <div class="page-title">
+                    <h1>About</h1>
+                    <p>Real-time airway traffic monitoring</p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div class="search-bar">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                        <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <input type="text" placeholder="Search flights, airports...">
+                </div>
+
+                <button class="icon-btn theme-toggle" aria-label="Toggle Theme">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </button>
+
+                <button class="icon-btn notifications" aria-label="Notifications">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <span class="badge">3</span>
+                </button>
+
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="8" r="4" fill="currentColor"/>
+                            <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">Admin User</span>
+                        <span class="user-role">Controller</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="about-container">
+
+            <section class="about-hero">
+                <div class="hero-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 11l8-4.5" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+                <h1 class="hero-title">Airway Traffic Decision Dashboard</h1>
+                <p class="hero-description">
+                    A frontend prototype dashboard interface designed to visualize airway traffic concepts, 
+                    including airport congestion metrics, flight delays & cancellations data, aircraft traffic patterns, 
+                    and weather impact displays using static mockup data.
+                </p>
+            </section>
+
+            <section class="about-section">
+                <h2 class="section-title">Project Objective</h2>
+                <div class="section-content">
+                    <p>
+                        This dashboard prototype demonstrates the user interface and visualization concepts for an air traffic 
+                        management system. It showcases various dashboard layouts, data presentation formats, and interactive 
+                        elements that could be used by air traffic controllers and aviation managers. The project focuses on 
+                        frontend design and user experience, using static data to simulate real-world scenarios.
+                    </p>
+                </div>
+            </section>
+
+            <section class="about-section">
+                <h2 class="section-title">Technologies Used</h2>
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <div class="tech-icon">HTML5</div>
+                        <h3>HTML</h3>
+                        <p>Semantic markup structure</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">CSS3</div>
+                        <h3>CSS</h3>
+                        <p>Modern styling & animations</p>
+                    </div>
+                    <div class="tech-card">
+                        <div class="tech-icon">JS</div>
+                        <h3>JavaScript</h3>
+                        <p>Interactive functionality</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="about-section">
+                <h2 class="section-title">
+                    <svg class="title-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Future Enhancements
+                </h2>
+                <div class="future-grid">
+                    <div class="future-card">
+                        <div class="future-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                                <path d="M3 9h18M9 3v18" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <h3>Backend Integration</h3>
+                        <p>Connect to real-time flight data APIs and databases</p>
+                    </div>
+                    <div class="future-card">
+                        <div class="future-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 15h18M9 9l-6 6 6 6" stroke="currentColor" stroke-width="2"/>
+                                <path d="M12 3C8 10 8 14 12 21" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <h3>Live Weather Data</h3>
+                        <p>Integration with weather services for real-time updates</p>
+                    </div>
+                    <div class="future-card">
+                        <div class="future-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 3l18 18M3 10h11M3 14h7M10 3v3M17 17v4M21 7v13" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <h3>Predictive Analytics</h3>
+                        <p>Machine learning models for delay and congestion prediction</p>
+                    </div>
+                    <div class="future-card">
+                        <div class="future-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="17" cy="17" r="4" stroke="currentColor" stroke-width="2"/>
+                                <path d="M13 11l-4 4" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <h3>User Authentication</h3>
+                        <p>Role-based access control and user management system</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="about-section">
+                <h2 class="section-title">Team Members</h2>
+                <div class="team-grid">
+                    <div class="team-card">
+                        <div class="team-avatar">AD</div>
+                        <h3 class="team-name">Adwika</h3>
+                        <p class="team-role">Student</p>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-avatar">RR</div>
+                        <h3 class="team-name">Richika Rani</h3>
+                        <p class="team-role">Student</p>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-avatar">MG</div>
+                        <h3 class="team-name">Mokshdaa Gupta</h3>
+                        <p class="team-role">Student</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="about-section">
+                <div class="architecture-card">
+                    <div class="architecture-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M3 9h18M9 3v18" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h2>Current Implementation</h2>
+                    <p>
+                        This is a static frontend prototype built using HTML, CSS, and JavaScript. All displayed data is 
+                        currently hardcoded or generated using mock data structures. The dashboard demonstrates the visual 
+                        design, layout concepts, and user interface interactions. Future development phases will include 
+                        backend API integration, database connectivity, and real-time data processing capabilities.
+                    </p>
+                </div>
+            </section>
+
+            <footer class="about-footer">
+                <p>© 2025 Airway Traffic Decision Dashboard. A frontend prototype project for academic evaluation.</p>
+            </footer>
+        </div>
+    </main>
+
+    <script src="../Overview/main.js"></script>
+</body>
+</html>
