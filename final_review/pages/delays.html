@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delays — AirIndia Traffic Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .filter-bar { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+    .filter-btn { padding:5px 14px; border-radius:20px; font-size:11px; font-family:var(--font-mono); cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--text2); transition:all .15s; }
+    .filter-btn.active { background:var(--amber-glow); border-color:rgba(245,158,11,.3); color:var(--amber); }
+    .search-input { padding:6px 12px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg3); color:var(--text); font-family:var(--font-mono); font-size:12px; outline:none; width:200px; }
+    .search-input::placeholder { color:var(--text3); }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebar-mount"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Delays & Cancellations</h1>
+        <p>Flight status tracking across Indian airports</p>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill"><div class="status-dot"></div>Live</div>
+      </div>
+    </div>
+
+    <div class="page-body fade-in">
+
+      <!-- KPIs -->
+      <div class="kpi-grid" id="delayKpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px"></div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Delay by Airport (avg min)</div></div>
+          <div class="chart-wrap"><canvas id="delayBarChart" height="200"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Status Distribution</div></div>
+          <div class="chart-wrap" style="max-width:260px;margin:0 auto"><canvas id="doughnutChart" height="220"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Flights table -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">All Flights</div></div>
+        <div class="filter-bar">
+          <button class="filter-btn active" onclick="filterFlights('all',this)">All</button>
+          <button class="filter-btn" onclick="filterFlights('On Time',this)">On Time</button>
+          <button class="filter-btn" onclick="filterFlights('Delayed',this)">Delayed</button>
+          <button class="filter-btn" onclick="filterFlights('Cancelled',this)">Cancelled</button>
+          <input class="search-input" id="searchInput" placeholder="Search flight / airline…" oninput="filterFlights('search',null)">
+        </div>
+        <table class="data-table" id="flightsTable">
+          <thead><tr><th>Flight</th><th>Airline</th><th>From</th><th>To</th><th>Dep.</th><th>Arr.</th><th>Type</th><th>Status</th><th>AI Risk</th></tr></thead>
+          <tbody id="flightsTbody"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/india-data.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+renderSidebar('delays');
+
+const onTime = LIVE_FLIGHTS.filter(f=>f.status==='On Time').length;
+const delayed = LIVE_FLIGHTS.filter(f=>f.status==='Delayed').length;
+const cancelled = LIVE_FLIGHTS.filter(f=>f.status==='Cancelled').length;
+const avgDelay = Math.round(AIRPORT_LIST.reduce((s,a)=>s+CONGESTION[a.code].delayAvg,0)/5);
+
+document.getElementById('delayKpis').innerHTML = [
+  { label:'On Time', value: onTime,    sub:`${Math.round(onTime/LIVE_FLIGHTS.length*100)}% of flights`,  color:'var(--green)' },
+  { label:'Delayed', value: delayed,   sub:`${Math.round(delayed/LIVE_FLIGHTS.length*100)}% of flights`, color:'var(--orange)' },
+  { label:'Cancelled',value: cancelled,sub:`${Math.round(cancelled/LIVE_FLIGHTS.length*100)}% of flights`,color:'var(--red)' },
+  { label:'Avg Delay', value: avgDelay+'m', sub:'Across all airports', color:'var(--amber)' },
+].map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+// Bar chart
+const bCtx = document.getElementById('delayBarChart').getContext('2d');
+new Chart(bCtx, {
+  type: 'bar',
+  data: {
+    labels: AIRPORT_LIST.map(a=>a.code),
+    datasets: [{ label:'Avg Delay (min)', data: AIRPORT_LIST.map(a=>CONGESTION[a.code].delayAvg), backgroundColor: AIRPORT_LIST.map(a=>a.color+'cc'), borderRadius:4 }]
+  },
+  options: { responsive:true, plugins:{legend:{display:false}}, scales:{x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.03)'}},y:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}}} }
+});
+
+// Doughnut
+const dCtx = document.getElementById('doughnutChart').getContext('2d');
+new Chart(dCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['On Time','Delayed','Cancelled'],
+    datasets: [{ data:[onTime,delayed,cancelled], backgroundColor:['#10b981','#f97316','#ef4444'], borderWidth:0 }]
+  },
+  options: { responsive:true, cutout:'70%', plugins:{ legend:{ position:'bottom', labels:{color:'#94a3b8',font:{size:10},padding:12} } } }
+});
+
+// Flights table
+let currentFilter = 'all';
+function filterFlights(filter, btn) {
+  if (filter !== 'search') {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+  }
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const rows = LIVE_FLIGHTS.filter(f => {
+    const matchFilter = currentFilter === 'all' || f.status === currentFilter;
+    const matchSearch = !search || f.no.toLowerCase().includes(search) || f.airline.toLowerCase().includes(search) || f.from.toLowerCase().includes(search) || f.to.toLowerCase().includes(search);
+    return matchFilter && matchSearch;
+  });
+
+  document.getElementById('flightsTbody').innerHTML = rows.map(f => {
+    const badge = f.status==='On Time'?'badge-green':f.status==='Cancelled'?'badge-red':'badge-orange';
+    const pred = predictDelay(f.from, parseInt(f.dep.split(':')[0]));
+    return `<tr>
+      <td style="font-weight:700;color:var(--text)">${f.no}</td>
+      <td>${f.airline}</td>
+      <td><span class="badge badge-blue">${f.from}</span></td>
+      <td><span class="badge badge-blue">${f.to}</span></td>
+      <td>${f.dep}</td>
+      <td>${f.arr}</td>
+      <td style="color:var(--text3)">${f.type}</td>
+      <td><span class="badge ${badge}">${f.status}${f.delay?` +${f.delay}`:''}</span></td>
+      <td style="color:${pred.riskColor};font-size:11px">${pred.predicted}m · ${pred.label}</td>
+    </tr>`;
+  }).join('');
+}
+filterFlights('all', null);
+</script>
+</body>
+</html>
