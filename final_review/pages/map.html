@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flight Map — AirIndia Traffic Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    #map { height: calc(100vh - var(--header-h) - 160px); border-radius: var(--radius-lg); z-index: 1; }
+    .leaflet-container { background: #0d1420; }
+    .map-legend {
+      position:absolute; bottom:20px; left:20px; z-index:1000;
+      background:rgba(13,20,32,0.92); border:1px solid var(--border);
+      border-radius:var(--radius); padding:12px; min-width:180px;
+    }
+    .map-legend h4 { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:.1em; margin-bottom:8px; }
+    .legend-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:11px; color:var(--text2); }
+    .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .flight-info-panel {
+      position:absolute; top:80px; right:20px; z-index:1000;
+      background:rgba(13,20,32,0.95); border:1px solid var(--border);
+      border-radius:var(--radius-lg); padding:16px; width:260px; display:none;
+    }
+    .flight-info-panel.show { display:block; animation:fadeIn .3s; }
+    .info-close { position:absolute; top:10px; right:12px; cursor:pointer; color:var(--text3); font-size:16px; }
+    .map-stats-bar {
+      display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px;
+    }
+    .map-stat { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:12px; }
+    .map-stat-val { font-family:var(--font-head); font-size:20px; font-weight:700; color:var(--amber); }
+    .map-stat-label { font-size:10px; color:var(--text3); margin-top:2px; }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebar-mount"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Live Flight Map</h1>
+        <p>Real-time positions across 5 Indian airports</p>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill"><div class="status-dot"></div>Live Tracking</div>
+      </div>
+    </div>
+
+    <div class="page-body fade-in" style="position:relative">
+
+      <!-- Stats bar -->
+      <div class="map-stats-bar">
+        <div class="map-stat"><div class="map-stat-val" id="ms-active">461</div><div class="map-stat-label">Active Flights</div></div>
+        <div class="map-stat"><div class="map-stat-val" id="ms-delayed">4</div><div class="map-stat-label">Delayed</div></div>
+        <div class="map-stat"><div class="map-stat-val" id="ms-cancelled">1</div><div class="map-stat-label">Cancelled</div></div>
+        <div class="map-stat"><div class="map-stat-val">5</div><div class="map-stat-label">Airports Tracked</div></div>
+      </div>
+
+      <!-- Map -->
+      <div id="map"></div>
+
+      <!-- Legend -->
+      <div class="map-legend">
+        <h4>Legend</h4>
+        <div class="legend-row"><div class="legend-dot" style="background:#f97316"></div>DEL — Delhi</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#3b82f6"></div>BOM — Mumbai</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#10b981"></div>BLR — Bengaluru</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#8b5cf6"></div>MAA — Chennai</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#ec4899"></div>CCU — Kolkata</div>
+        <hr style="border-color:var(--border);margin:8px 0">
+        <div class="legend-row"><span style="color:var(--green)">●</span> On Time</div>
+        <div class="legend-row"><span style="color:var(--orange)">●</span> Delayed</div>
+        <div class="legend-row"><span style="color:var(--red)">●</span> Cancelled</div>
+      </div>
+
+      <!-- Flight detail panel -->
+      <div class="flight-info-panel" id="flightPanel">
+        <span class="info-close" onclick="document.getElementById('flightPanel').classList.remove('show')">✕</span>
+        <div id="flightPanelContent"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/india-data.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+renderSidebar('map');
+
+// Counters
+document.getElementById('ms-active').textContent = AIRPORT_LIST.reduce((s,a)=>s+a.activeFlights,0);
+document.getElementById('ms-delayed').textContent = LIVE_FLIGHTS.filter(f=>f.status==='Delayed').length;
+document.getElementById('ms-cancelled').textContent = LIVE_FLIGHTS.filter(f=>f.status==='Cancelled').length;
+
+// Map initialization
+const map = L.map('map', {
+  center: [20.5937, 78.9629],
+  zoom: 5,
+  zoomControl: true,
+  attributionControl: false
+});
+
+// Dark tile layer
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap, © CARTO',
+  maxZoom: 12
+}).addTo(map);
+
+// Airport markers
+AIRPORT_LIST.forEach(airport => {
+  const c = CONGESTION[airport.code];
+  const size = Math.max(20, Math.min(44, airport.dailyFlights / 35));
+
+  const icon = L.divIcon({
+    className: '',
+    html: `<div style="
+      width:${size}px; height:${size}px;
+      background:${airport.color}22;
+      border:2px solid ${airport.color};
+      border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'JetBrains Mono',monospace;
+      font-size:9px; font-weight:700; color:${airport.color};
+      box-shadow: 0 0 12px ${airport.color}44;
+      cursor:pointer;
+    ">${airport.code}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2]
+  });
+
+  L.marker([airport.lat, airport.lng], { icon })
+    .addTo(map)
+    .bindPopup(`
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;min-width:200px;background:#141c2b;color:#e2e8f0;padding:4px">
+        <div style="font-size:16px;font-weight:800;color:${airport.color};margin-bottom:6px">${airport.code} — ${airport.city}</div>
+        <div style="color:#94a3b8;font-size:11px;margin-bottom:10px">${airport.name}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div><div style="font-size:10px;color:#475569">Daily Flights</div><div style="font-weight:700">${airport.dailyFlights}</div></div>
+          <div><div style="font-size:10px;color:#475569">Active Now</div><div style="font-weight:700">${airport.activeFlights}</div></div>
+          <div><div style="font-size:10px;color:#475569">Congestion</div><div style="font-weight:700;color:${airport.color}">${c.level}</div></div>
+          <div><div style="font-size:10px;color:#475569">Avg Delay</div><div style="font-weight:700">${c.delayAvg} min</div></div>
+        </div>
+      </div>
+    `, { className: 'dark-popup' });
+});
+
+// Flight paths
+LIVE_FLIGHTS.forEach(flight => {
+  const fromAp = INDIAN_AIRPORTS[flight.from];
+  const toAp   = INDIAN_AIRPORTS[flight.to];
+  if (!fromAp || !toAp) return;
+
+  const color = flight.status === 'On Time' ? '#10b981' : flight.status === 'Cancelled' ? '#ef4444' : '#f97316';
+
+  // Draw curved-ish line
+  const latlngs = [[fromAp.lat, fromAp.lng], [toAp.lat, toAp.lng]];
+  L.polyline(latlngs, { color, weight: 1.5, opacity: 0.6, dashArray: flight.status==='Cancelled'?'6,6':null }).addTo(map);
+
+  // Midpoint marker for plane icon
+  const midLat = (fromAp.lat + toAp.lat) / 2;
+  const midLng = (fromAp.lng + toAp.lng) / 2;
+
+  const planeIcon = L.divIcon({
+    className: '',
+    html: `<div style="cursor:pointer;font-size:14px;filter:drop-shadow(0 0 4px ${color})" title="${flight.no}">✈</div>`,
+    iconSize: [18, 18], iconAnchor: [9, 9]
+  });
+
+  L.marker([midLat, midLng], { icon: planeIcon })
+    .addTo(map)
+    .on('click', () => {
+      const panel = document.getElementById('flightPanel');
+      const pred = predictDelay(flight.from, parseInt(flight.dep.split(':')[0]));
+      document.getElementById('flightPanelContent').innerHTML = `
+        <div style="font-size:16px;font-weight:800;color:${color};margin-bottom:4px">${flight.no}</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:12px">${flight.airline}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+          <div><div style="font-size:10px;color:var(--text3)">From</div><div style="font-weight:700;color:var(--amber)">${flight.from}</div></div>
+          <div><div style="font-size:10px;color:var(--text3)">To</div><div style="font-weight:700;color:var(--amber)">${flight.to}</div></div>
+          <div><div style="font-size:10px;color:var(--text3)">Departure</div><div style="font-weight:600">${flight.dep}</div></div>
+          <div><div style="font-size:10px;color:var(--text3)">Arrival</div><div style="font-weight:600">${flight.arr}</div></div>
+          <div><div style="font-size:10px;color:var(--text3)">Type</div><div style="font-weight:600">${flight.type}</div></div>
+          <div><div style="font-size:10px;color:var(--text3)">Status</div><div style="font-weight:700;color:${color}">${flight.status}${flight.delay?' +'+flight.delay:''}</div></div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px">
+          <div style="font-size:10px;color:var(--text3);margin-bottom:6px">🤖 AI Prediction for ${flight.from}</div>
+          <div style="font-size:18px;font-weight:800;color:${pred.riskColor}">${pred.predicted} min delay</div>
+          <div style="font-size:11px;color:${pred.riskColor}">${pred.label} · ${pred.confidence}% conf.</div>
+        </div>`;
+      panel.classList.add('show');
+    });
+});
+
+// Custom popup style
+const style = document.createElement('style');
+style.textContent = `.dark-popup .leaflet-popup-content-wrapper { background:#141c2b; border:1px solid #1e2d44; color:#e2e8f0; border-radius:8px; box-shadow:0 4px 24px rgba(0,0,0,.8); } .dark-popup .leaflet-popup-tip { background:#141c2b; } .leaflet-popup-close-button { color:#94a3b8 !important; }`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
