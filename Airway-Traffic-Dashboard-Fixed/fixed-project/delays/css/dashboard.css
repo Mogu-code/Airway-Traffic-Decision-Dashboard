@@ -2,13 +2,9 @@
    DASHBOARD CONTAINER
    ========================================== */
 .dashboard-container {
-    
     max-width: 1600px;
     margin: 0 auto;
-    
-    margin-left: 250px;
     padding: 2rem;
-
 }
 
 /* ==========================================
