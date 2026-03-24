@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aircraft Traffic — AirIndia Traffic Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebar-mount"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Aircraft Traffic & Density</h1>
+        <p>Fleet composition and movement data — Indian airports</p>
+      </div>
+      <div class="topbar-right">
+        <select class="airport-selector" id="airportSel" onchange="updatePage()">
+          <option value="ALL">All Airports</option>
+          <option value="DEL">DEL — Delhi</option>
+          <option value="BOM">BOM — Mumbai</option>
+          <option value="BLR">BLR — Bengaluru</option>
+          <option value="MAA">MAA — Chennai</option>
+          <option value="CCU">CCU — Kolkata</option>
+        </select>
+        <div class="status-pill"><div class="status-dot"></div>Live</div>
+      </div>
+    </div>
+
+    <div class="page-body fade-in">
+
+      <div class="kpi-grid" id="trafficKpis"></div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Aircraft Type Distribution</div></div>
+          <div class="chart-wrap" style="max-width:280px;margin:0 auto"><canvas id="typeDonut" height="240"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Hourly Traffic Volume</div></div>
+          <div class="chart-wrap"><canvas id="hourlyLine" height="220"></canvas></div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Airline-wise Flights</div></div>
+          <div class="chart-wrap"><canvas id="airlineBar" height="220"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Fleet Mix Comparison</div></div>
+          <div class="chart-wrap"><canvas id="stackedBar" height="220"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">Aircraft Type Details</div></div>
+        <table class="data-table" id="typeTable"></table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/india-data.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+renderSidebar('traffic');
+
+let typeChart, hourChart, airlineChart, stackChart;
+
+function getMixData(code) {
+  if (code === 'ALL') {
+    const merged = { 'Narrow Body':0,'Wide Body':0,'Cargo':0,'Regional':0 };
+    Object.values(AIRCRAFT_MIX).forEach(mix => mix.forEach(m => merged[m.type] = (merged[m.type]||0)+m.count));
+    return Object.entries(merged).map(([type,count])=>({type,count,pct:Math.round(count/Object.values(merged).reduce((s,v)=>s+v,0)*100)}));
+  }
+  return AIRCRAFT_MIX[code];
+}
+
+function getAirlineFlights(code) {
+  const flights = code === 'ALL' ? LIVE_FLIGHTS : LIVE_FLIGHTS.filter(f=>f.from===code||f.to===code);
+  const counts = {};
+  flights.forEach(f => counts[f.airline] = (counts[f.airline]||0)+1);
+  return Object.entries(counts).map(([n,c])=>({name:n,count:c})).sort((a,b)=>b.count-a.count);
+}
+
+function updatePage() {
+  const code = document.getElementById('airportSel').value;
+  const airports = code === 'ALL' ? AIRPORT_LIST : [INDIAN_AIRPORTS[code]];
+  const mix = getMixData(code);
+  const totalActive = airports.reduce((s,a)=>s+a.activeFlights,0);
+  const totalDaily  = airports.reduce((s,a)=>s+a.dailyFlights,0);
+  const airlineFlts = getAirlineFlights(code);
+
+  // KPIs
+  const cols = ['var(--amber)','var(--green)','var(--blue)','var(--purple)'];
+  document.getElementById('trafficKpis').innerHTML = [
+    { label:'Daily Flights',  value:totalDaily,  sub:'Total scheduled today', color:cols[0] },
+    { label:'Active Now',     value:totalActive, sub:'In-air right now',      color:cols[1] },
+    { label:'Aircraft Types', value:mix.length,  sub:'Fleet categories',      color:cols[2] },
+    { label:'Airlines',       value:airlineFlts.length, sub:'Carriers operating', color:cols[3] },
+    { label:'Peak Hour Load', value:'07:00–09:00', sub:'Busiest window',      color:'var(--orange)' }
+  ].map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}"><div class="kpi-label">${k.label}</div><div class="kpi-value">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+  const typeColors = ['#f59e0b','#3b82f6','#10b981','#8b5cf6'];
+
+  // Donut
+  if (typeChart) typeChart.destroy();
+  typeChart = new Chart(document.getElementById('typeDonut').getContext('2d'), {
+    type:'doughnut',
+    data:{ labels:mix.map(m=>m.type), datasets:[{data:mix.map(m=>m.count),backgroundColor:typeColors,borderWidth:0}] },
+    options:{ responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},padding:10}}} }
+  });
+
+  // Hourly
+  if (hourChart) hourChart.destroy();
+  const col = code==='ALL'?'#f59e0b':INDIAN_AIRPORTS[code].color;
+  hourChart = new Chart(document.getElementById('hourlyLine').getContext('2d'), {
+    type:'line',
+    data:{ labels:HOURLY_TRAFFIC.map(h=>h.hour), datasets:[{label:'Traffic',data:HOURLY_TRAFFIC.map(h=>h.volume),borderColor:col,backgroundColor:col+'18',fill:true,tension:0.4,pointRadius:0,borderWidth:2}] },
+    options:{ responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.03)'}},y:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}}} }
+  });
+
+  // Airline bar
+  if (airlineChart) airlineChart.destroy();
+  airlineChart = new Chart(document.getElementById('airlineBar').getContext('2d'), {
+    type:'bar',
+    data:{ labels:airlineFlts.map(a=>a.name), datasets:[{label:'Flights',data:airlineFlts.map(a=>a.count),backgroundColor:AIRLINES.map(al=>al.color+'cc'),borderRadius:4}] },
+    options:{ indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#94a3b8',font:{size:10}},grid:{display:false}}} }
+  });
+
+  // Stacked bar
+  if (stackChart) stackChart.destroy();
+  stackChart = new Chart(document.getElementById('stackedBar').getContext('2d'), {
+    type:'bar',
+    data:{
+      labels: AIRPORT_LIST.map(a=>a.code),
+      datasets: ['Narrow Body','Wide Body','Cargo','Regional'].map((t,i)=>({
+        label:t,
+        data:AIRPORT_LIST.map(a=>AIRCRAFT_MIX[a.code].find(m=>m.type===t)?.count||0),
+        backgroundColor:typeColors[i]+'cc',borderRadius:i===3?4:0
+      }))
+    },
+    options:{ responsive:true,scales:{x:{stacked:true,ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.03)'}},y:{stacked:true,ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}}},plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}} }
+  });
+
+  // Type table
+  document.getElementById('typeTable').innerHTML = `
+    <thead><tr><th>Aircraft Type</th><th>Count</th><th>Fleet Share</th><th>Avg Occupancy</th><th>Bar</th></tr></thead>
+    <tbody>${mix.map((m,i)=>`
+      <tr>
+        <td style="font-weight:700;color:${typeColors[i]}">${m.type}</td>
+        <td>${m.count}</td>
+        <td>${m.pct}%</td>
+        <td>${82+Math.floor(Math.random()*12)}%</td>
+        <td><div class="progress-wrap" style="width:120px"><div class="progress-fill" style="width:${m.pct}%;background:${typeColors[i]}"></div></div></td>
+      </tr>`).join('')}
+    </tbody>`;
+}
+
+updatePage();
+</script>
+</body>
+</html>

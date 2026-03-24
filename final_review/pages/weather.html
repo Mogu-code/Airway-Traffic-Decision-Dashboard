@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Impact — AirIndia Traffic Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .weather-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; }
+    .weather-icon-big { font-size:48px; }
+    .temp { font-family:var(--font-head); font-size:36px; font-weight:800; }
+    .forecast-row { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:16px; }
+    .forecast-cell { flex-shrink:0; background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:10px 14px; text-align:center; min-width:70px; }
+    .forecast-cell .fc-icon { font-size:20px; margin:4px 0; }
+    .forecast-cell .fc-temp { font-weight:700; font-size:13px; }
+    .forecast-cell .fc-time { font-size:10px; color:var(--text3); }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebar-mount"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Weather Impact</h1>
+        <p>Current conditions & delay risk for Indian airports</p>
+      </div>
+      <div class="topbar-right">
+        <select class="airport-selector" id="airportSel" onchange="updateWeatherPanel()">
+          <option value="DEL">DEL — Delhi</option>
+          <option value="BOM">BOM — Mumbai</option>
+          <option value="BLR">BLR — Bengaluru</option>
+          <option value="MAA">MAA — Chennai</option>
+          <option value="CCU">CCU — Kolkata</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="page-body fade-in">
+
+      <!-- Weather cards row -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px" id="weatherCards"></div>
+
+      <div class="grid-2-1" style="margin-bottom:20px">
+        <!-- Selected airport panel -->
+        <div>
+          <div class="weather-card" style="margin-bottom:16px" id="mainWeather"></div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">48h Forecast</div></div>
+            <div class="forecast-row" id="forecastRow"></div>
+            <div class="chart-wrap"><canvas id="forecastChart" height="160"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Right col -->
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-head"><div class="card-title">Delay Risk by Airport</div></div>
+            <div class="chart-wrap"><canvas id="riskBar" height="200"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div class="card-title">Weather vs Delay Correlation</div></div>
+            <table class="data-table" id="corrTable"></table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/india-data.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+renderSidebar('weather');
+
+const severityColor = { Low:'#10b981', Medium:'#f59e0b', High:'#ef4444' };
+
+// Weather cards
+document.getElementById('weatherCards').innerHTML = AIRPORT_LIST.map(a => {
+  const w = WEATHER[a.code];
+  const col = severityColor[w.severity];
+  return `
+  <div class="card" style="border-top:3px solid ${col};text-align:center;cursor:pointer" onclick="document.getElementById('airportSel').value='${a.code}';updateWeatherPanel()">
+    <div style="font-family:var(--font-head);font-size:18px;font-weight:800;color:${a.color}">${a.code}</div>
+    <div style="font-size:32px;margin:8px 0">${w.icon}</div>
+    <div style="font-weight:700;font-size:18px">${w.temp}°C</div>
+    <div style="font-size:11px;color:var(--text3)">${w.condition}</div>
+    <div style="margin-top:8px"><span class="badge" style="background:${col}22;color:${col};font-size:10px">${w.severity} Risk</span></div>
+    <div style="font-size:10px;color:var(--text3);margin-top:6px">Delay risk: ${w.delayRisk}%</div>
+  </div>`;
+}).join('');
+
+// Risk bar chart
+const rCtx = document.getElementById('riskBar').getContext('2d');
+new Chart(rCtx, {
+  type:'bar',
+  data:{
+    labels:AIRPORT_LIST.map(a=>a.code),
+    datasets:[{label:'Delay Risk %',data:AIRPORT_LIST.map(a=>WEATHER[a.code].delayRisk),backgroundColor:AIRPORT_LIST.map(a=>severityColor[WEATHER[a.code].severity]+'cc'),borderRadius:4}]
+  },
+  options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.03)'}},y:{min:0,max:100,ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}}}}
+});
+
+// Correlation table
+const corrData = [
+  {cond:'Clear',risk:'5%',impact:'Minimal',avgDelay:'3 min'},
+  {cond:'Haze',risk:'35%',impact:'Moderate',avgDelay:'18 min'},
+  {cond:'Storm',risk:'72%',impact:'High',avgDelay:'42 min'},
+  {cond:'Humid',risk:'10%',impact:'Low',avgDelay:'6 min'},
+];
+document.getElementById('corrTable').innerHTML = `
+  <thead><tr><th>Condition</th><th>Delay Risk</th><th>Impact Level</th><th>Avg Delay</th></tr></thead>
+  <tbody>${corrData.map(r=>`<tr><td>${r.cond}</td><td>${r.risk}</td><td>${r.impact}</td><td>${r.avgDelay}</td></tr>`).join('')}</tbody>`;
+
+// Forecast data
+const FORECASTS = {
+  DEL: [{t:'+0h',icon:'🌫️',temp:31,cond:'Haze'},{t:'+3h',icon:'🌫️',temp:33,cond:'Haze'},{t:'+6h',icon:'☀️',temp:35,cond:'Clear'},{t:'+12h',icon:'☀️',temp:32,cond:'Clear'},{t:'+24h',icon:'🌤️',temp:29,cond:'Partly Cloudy'},{t:'+36h',icon:'🌧️',temp:27,cond:'Rain'},{t:'+48h',icon:'⛈️',temp:25,cond:'Storm'}],
+  BOM: [{t:'+0h',icon:'☀️',temp:33,cond:'Clear'},{t:'+3h',icon:'☀️',temp:35,cond:'Clear'},{t:'+6h',icon:'🌤️',temp:34,cond:'Partly Cloudy'},{t:'+12h',icon:'🌤️',temp:31,cond:'Partly Cloudy'},{t:'+24h',icon:'☀️',temp:32,cond:'Clear'},{t:'+36h',icon:'☀️',temp:33,cond:'Clear'},{t:'+48h',icon:'☀️',temp:32,cond:'Clear'}],
+  BLR: [{t:'+0h',icon:'☀️',temp:27,cond:'Clear'},{t:'+3h',icon:'☀️',temp:29,cond:'Clear'},{t:'+6h',icon:'🌤️',temp:28,cond:'Partly Cloudy'},{t:'+12h',icon:'🌤️',temp:26,cond:'Partly Cloudy'},{t:'+24h',icon:'☀️',temp:27,cond:'Clear'},{t:'+36h',icon:'☀️',temp:28,cond:'Clear'},{t:'+48h',icon:'🌧️',temp:25,cond:'Light Rain'}],
+  MAA: [{t:'+0h',icon:'🌤️',temp:35,cond:'Humid'},{t:'+3h',icon:'🌤️',temp:37,cond:'Humid'},{t:'+6h',icon:'☀️',temp:36,cond:'Clear'},{t:'+12h',icon:'🌤️',temp:34,cond:'Humid'},{t:'+24h',icon:'🌧️',temp:31,cond:'Rain'},{t:'+36h',icon:'🌤️',temp:30,cond:'Humid'},{t:'+48h',icon:'🌤️',temp:32,cond:'Humid'}],
+  CCU: [{t:'+0h',icon:'⛈️',temp:29,cond:'Storm'},{t:'+3h',icon:'⛈️',temp:27,cond:'Storm'},{t:'+6h',icon:'🌧️',temp:28,cond:'Rain'},{t:'+12h',icon:'🌤️',temp:30,cond:'Clearing'},{t:'+24h',icon:'☀️',temp:32,cond:'Clear'},{t:'+36h',icon:'☀️',temp:33,cond:'Clear'},{t:'+48h',icon:'☀️',temp:31,cond:'Clear'}],
+};
+
+let fcChart;
+function updateWeatherPanel() {
+  const code = document.getElementById('airportSel').value;
+  const w = WEATHER[code];
+  const a = INDIAN_AIRPORTS[code];
+  const col = severityColor[w.severity];
+  const c = CONGESTION[code];
+
+  document.getElementById('mainWeather').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div style="font-family:var(--font-head);font-size:22px;font-weight:800;color:${a.color}">${code} — ${a.city}</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">${a.name}</div>
+        <div class="temp">${w.temp}°C</div>
+        <div style="font-size:14px;color:var(--text2);margin-top:4px">${w.condition}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="weather-icon-big">${w.icon}</div>
+        <span class="badge" style="background:${col}22;color:${col}">${w.severity} Delay Risk</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <div><div style="font-size:10px;color:var(--text3)">Wind</div><div style="font-weight:700;color:var(--blue)">${w.wind} km/h</div></div>
+      <div><div style="font-size:10px;color:var(--text3)">Humidity</div><div style="font-weight:700;color:var(--purple)">${w.humidity}%</div></div>
+      <div><div style="font-size:10px;color:var(--text3)">Delay Risk</div><div style="font-weight:700;color:${col}">${w.delayRisk}%</div></div>
+    </div>`;
+
+  const fc = FORECASTS[code] || FORECASTS.DEL;
+  document.getElementById('forecastRow').innerHTML = fc.map(f=>`
+    <div class="forecast-cell">
+      <div class="fc-time">${f.t}</div>
+      <div class="fc-icon">${f.icon}</div>
+      <div class="fc-temp">${f.temp}°</div>
+    </div>`).join('');
+
+  if (fcChart) fcChart.destroy();
+  fcChart = new Chart(document.getElementById('forecastChart').getContext('2d'), {
+    type:'line',
+    data:{ labels:fc.map(f=>f.t), datasets:[{label:'Temp °C',data:fc.map(f=>f.temp),borderColor:a.color,backgroundColor:a.color+'18',fill:true,tension:0.4,pointRadius:3,borderWidth:2}] },
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(255,255,255,0.03)'}},y:{ticks:{color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'}}}}
+  });
+}
+updateWeatherPanel();
+</script>
+</body>
+</html>
