@@ -190,7 +190,7 @@ const OpenSky = (() => {
     return flights;
   }
 
-  // ── PUBLIC API ─────────────────────────────────────────────
+  // ── PUBLIC API ─
   return {
 
     /**
@@ -219,12 +219,6 @@ const OpenSky = (() => {
       _pollTimer = null;
     },
 
-    /**
-     * Register a callback for data updates.
-     * cb(results, anyReal)
-     *   results = { DEL: { flights:[], ts, real }, BOM:..., ... }
-     *   anyReal = true if at least one airport got live data
-     */
     onUpdate(cb) {
       _listeners.push(cb);
     },
