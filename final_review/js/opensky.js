@@ -1,14 +1,7 @@
 
 const OpenSky = (() => {
-
-  // ── CONFIGURE YOUR FREE ACCOUNT HERE ──────────────────────
-  // Leave blank to use anonymous mode (400 req/day limit)
-  // Or sign up free at: https://opensky-network.org/login
   const OPENSKY_USER = '';   // e.g. 'your_username'
   const OPENSKY_PASS = '';   // e.g. 'your_password'
-
-  // How often to poll the API (milliseconds)
-  // 60000 = 1 minute. Don't go below 30000 or you'll hit rate limits.
   const POLL_INTERVAL = 60000;
 
   // ── AIRPORT BOUNDING BOXES ─────────────────────────────────
