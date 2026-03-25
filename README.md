@@ -1,0 +1,133 @@
+# ✈ AirIndia Traffic Dashboard
+
+A real-time airway traffic monitoring dashboard for 5 major Indian airports, built as a web development project. Features live flight tracking via the OpenSky Network API, interactive maps, and an AI-powered delay predictor.
+
+---
+
+## 🛫 Airports Tracked
+
+| Code | Airport | City |
+|------|---------|------|
+| DEL | Indira Gandhi International | New Delhi |
+| BOM | Chhatrapati Shivaji Maharaj International | Mumbai |
+| BLR | Kempegowda International | Bengaluru |
+| MAA | Chennai International | Chennai |
+| CCU | Netaji Subhas Chandra Bose International | Kolkata |
+
+---
+
+## 📁 Project Structure
+
+```
+airtraffic-india/
+├── css/
+│   └── shared.css          # Global styles and dark theme
+├── js/
+│   ├── india-data.js       # Static airport, weather, congestion data + kNN model
+│   ├── opensky.js          # OpenSky API service — live flight fetching
+│   └── sidebar.js          # Sidebar navigation injected on every page
+└── pages/
+    ├── overview.html       # Summary stats for all 5 airports
+    ├── traffic.html        # Aircraft type and hourly volume charts
+    ├── congestion.html     # Airport congestion levels
+    ├── delays.html         # Delay reasons and cancellation rates
+    ├── weather.html        # Weather conditions and impact on flights
+    ├── map.html            # 🗺 Live flight map (OpenSky powered)
+    ├── predictor.html      # 🤖 AI delay predictor (k-NN algorithm)
+    └── about.html          # Project info
+```
+
+---
+
+## 🚀 How to Run
+
+> ⚠️ You cannot open the HTML files directly — a local server is required for the OpenSky API to work (CORS restriction).
+
+**Option A — Python**
+```bash
+cd airtraffic-india
+python -m http.server 8000
+# Open: http://localhost:8000/pages/overview.html
+```
+
+**Option B — VS Code**
+Install the [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension → right-click `overview.html` → **Open with Live Server**
+
+---
+
+## 🔑 Enabling Live Flight Data
+
+Open `js/opensky.js` and add your OpenSky credentials:
+
+```js
+const OPENSKY_USER = 'your_username';   // from opensky-network.org
+const OPENSKY_PASS = 'your_password';
+```
+
+Register for free at [opensky-network.org](https://opensky-network.org/login) — one account works forever, no API key needed, just your login username and password.
+
+If credentials are left blank, the dashboard runs in **anonymous mode** (400 requests/day) and falls back to simulation automatically if the limit is hit.
+
+---
+
+## 📡 OpenSky API — Limits
+
+| Mode | Requests/day | Notes |
+|------|-------------|-------|
+| Anonymous | 400 | No account needed |
+| Free account | 4,000 | Register once at opensky-network.org |
+
+The dashboard polls every **60 seconds × 5 airports = 5 requests/poll**. For a class demo, change the interval to avoid burning the quota:
+
+```js
+// In js/opensky.js
+const POLL_INTERVAL = 600000;  // 10 minutes = 720 req/day (recommended)
+```
+
+---
+
+## 🤖 AI Delay Predictor
+
+Uses **k-Nearest Neighbors (k=3)** — a supervised ML algorithm trained on 25 historical flight records.
+
+**Input features:**
+- Congestion % at the airport
+- Wind speed
+- Humidity  
+- Hour of day
+
+**OpenSky integration:** When live data is available, the real-time aircraft count near each airport is blended into the congestion input (60% live + 40% static), making predictions dynamic rather than purely historical.
+
+---
+
+## 🗺 Live Map Features
+
+- Aircraft positions update every 60 seconds from OpenSky
+- ✈ airborne &nbsp; ⬆ climbing &nbsp; ⬇ descending &nbsp; ⬟ on ground
+- Click any aircraft to see callsign, altitude, speed, heading, and AI delay prediction
+- Automatically falls back to realistic simulation if OpenSky is unavailable
+- Status bar shows Live / Simulated mode and daily API usage
+
+---
+
+## 🛠 Technologies
+
+| Technology | Used For |
+|-----------|---------|
+| HTML5 / CSS3 / JavaScript | All pages — no framework |
+| [Chart.js](https://www.chartjs.org/) | All charts and visualisations |
+| [Leaflet.js](https://leafletjs.com/) | Interactive flight map |
+| [OpenSky Network API](https://opensky-network.org/) | Real-time aircraft positions |
+| CartoDB Dark Tiles | Dark map background |
+
+---
+
+## ⚠️ Known Limitations
+
+- Weather data is static (manually set in `india-data.js`) — a production version would use a live weather API
+- kNN is trained on 25 data points — sufficient for a demo, not for production
+- Credentials in `opensky.js` are visible in browser source code — fine for a student project
+
+---
+
+*Web Development Project — 2025*
