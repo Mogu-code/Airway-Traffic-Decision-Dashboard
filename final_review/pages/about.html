@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — AirIndia Traffic Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <style>
+    .about-hero { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:32px; margin-bottom:20px; text-align:center; }
+    .about-hero h2 { font-family:var(--font-head); font-size:32px; font-weight:800; color:var(--amber); margin-bottom:8px; }
+    .about-hero p { color:var(--text2); max-width:600px; margin:0 auto; line-height:1.8; }
+    .tech-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+    .tech-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; }
+    .tech-icon { font-size:28px; margin-bottom:8px; }
+    .tech-title { font-family:var(--font-head); font-size:13px; font-weight:700; color:var(--text); margin-bottom:4px; }
+    .tech-desc { font-size:11px; color:var(--text3); line-height:1.6; }
+    .airport-row { display:flex; gap:16px; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); }
+    .airport-row:last-child { border-bottom:none; }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebar-mount"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title"><h1>About This Project</h1><p>Airway Traffic Decision Dashboard</p></div>
+    </div>
+    <div class="page-body fade-in">
+
+      <div class="about-hero">
+        <div style="font-size:48px;margin-bottom:12px">✈️</div>
+        <h2>AirIndia Traffic Dashboard</h2>
+        <p>A web development project for monitoring real-time airway traffic across 5 major Indian airports. Built with vanilla HTML, CSS, and JavaScript — featuring ML-powered delay prediction, live flight maps, and unified data visualization.</p>
+      </div>
+
+      <div class="tech-grid">
+        <div class="tech-card" style="border-top:3px solid var(--amber)">
+          <div class="tech-icon">🤖</div>
+          <div class="tech-title">k-NN ML Predictor</div>
+          <div class="tech-desc">k-Nearest Neighbors algorithm trained on 25 data points — predicts flight delays using congestion, weather, wind, humidity, and time of day.</div>
+        </div>
+        <div class="tech-card" style="border-top:3px solid var(--blue)">
+          <div class="tech-icon">🗺️</div>
+          <div class="tech-title">Live Flight Map</div>
+          <div class="tech-desc">Leaflet.js interactive map showing real airport positions, flight paths between airports, and live plane position markers.</div>
+        </div>
+        <div class="tech-card" style="border-top:3px solid var(--green)">
+          <div class="tech-icon">📊</div>
+          <div class="tech-title">Chart.js Visualizations</div>
+          <div class="tech-desc">11+ chart types across 6 pages — bar, line, doughnut, radar, stacked, and area charts with consistent dark theming.</div>
+        </div>
+        <div class="tech-card" style="border-top:3px solid var(--purple)">
+          <div class="tech-icon">🇮🇳</div>
+          <div class="tech-title">Real Indian Airport Data</div>
+          <div class="tech-desc">Actual IATA codes, coordinates, capacities, and realistic traffic figures for DEL, BOM, BLR, MAA, and CCU airports.</div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Airports Covered</div>
+          <div id="airportList"></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">Pages & Features</div>
+          <table class="data-table">
+            <thead><tr><th>Page</th><th>Key Feature</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--text)">Overview</td><td>System-wide KPIs & airport cards</td></tr>
+              <tr><td style="color:var(--text)">Aircraft Traffic</td><td>Fleet mix, airline breakdown, per-airport filter</td></tr>
+              <tr><td style="color:var(--text)">Congestion</td><td>Circular progress, radar chart, timeline</td></tr>
+              <tr><td style="color:var(--text)">Delays</td><td>Searchable table, filter, AI risk column</td></tr>
+              <tr><td style="color:var(--text)">Weather</td><td>48h forecast, delay risk, airport selector</td></tr>
+              <tr><td style="color:var(--text)">AI Predictor</td><td>k-NN ML model, interactive sliders</td></tr>
+              <tr><td style="color:var(--text)">Flight Map</td><td>Leaflet.js interactive map with routes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- <div class="card"> -->
+        <!-- <div class="card-title" style="margin-bottom:16px">Tech Stack</div> -->
+        <!-- <div style="display:flex;flex-wrap:wrap;gap:8px"> -->
+          <!-- ${['HTML5','CSS3','Vanilla JavaScript','Chart.js','Leaflet.js','Google Fonts','k-NN Algorithm','CSS Grid','Flexbox','CSS Variables','JetBrains Mono','Syne Font'].map(t=>`<span class="badge badge-amber">${t}</span>`).join('')} -->
+        <!-- </div> -->
+      <!-- </div> -->
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/india-data.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+renderSidebar('about');
+document.getElementById('airportList').innerHTML = AIRPORT_LIST.map(a => `
+  <div class="airport-row">
+    <div style="width:44px;height:44px;background:${a.color}22;border:1px solid ${a.color};border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:12px;font-weight:800;color:${a.color};flex-shrink:0">${a.code}</div>
+    <div>
+      <div style="font-weight:700;color:var(--text)">${a.name}</div>
+      <div style="font-size:11px;color:var(--text3)">${a.city}, ${a.state} · ${a.dailyFlights} daily flights · ${a.runways} runways</div>
+    </div>
+  </div>`).join('');
+</script>
+</body>
+</html>

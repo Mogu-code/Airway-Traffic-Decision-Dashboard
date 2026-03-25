@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Congestion — AirIndia Traffic Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .cong-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:20px; }
+    .cong-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:16px; }
+    .cong-code { font-family:var(--font-head); font-size:24px; font-weight:800; }
+    .cong-circle-wrap { position:relative; width:100px; height:100px; margin:12px auto; }
+    .cong-circle-bg { fill:none; stroke:var(--bg3); stroke-width:8; }
+    .cong-circle-fg { fill:none; stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset .8s ease; transform:rotate(-90deg); transform-origin:50% 50%; }
+    .cong-pct { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:var(--font-head); font-size:20px; font-weight:800; }
+    .meter-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+    .meter-code { font-weight:700; color:var(--text); width:40px; }
+    .meter-bar-wrap { flex:1; background:var(--bg3); border-radius:3px; height:10px; overflow:hidden; }
+    .meter-bar { height:100%; border-radius:3px; transition:width .8s ease; }
+    .meter-right { display:flex; gap:12px; width:120px; justify-content:flex-end; }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebar-mount"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Airport Congestion</h1>
+        <p>Real-time capacity utilization across 5 Indian airports</p>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill"><div class="status-dot"></div>Live Data</div>
+      </div>
+    </div>
+
+    <div class="page-body fade-in">
+
+      <!-- Congestion circle cards -->
+      <div class="cong-grid" id="congCards"></div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <!-- Meter bars -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Capacity Utilization</div></div>
+          <div id="meterBars"></div>
+        </div>
+
+        <!-- Radar chart -->
+        <div class="card">
+          <div class="card-head"><div class="card-title">Multi-Factor Analysis</div></div>
+          <div class="chart-wrap"><canvas id="radarChart" height="220"></canvas></div>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Active Flights Right Now</div></div>
+          <div class="chart-wrap"><canvas id="activeBar" height="200"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">Congestion Timeline (Simulated)</div></div>
+          <div class="chart-wrap"><canvas id="timelineChart" height="200"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Aircraft mix table -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">Aircraft Mix by Airport</div></div>
+        <div class="airport-tabs" id="acTabs"></div>
+        <div id="acTable"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/india-data.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+renderSidebar('congestion');
+
+const levelColor = { Critical:'#ef4444', High:'#f97316', Moderate:'#f59e0b', Low:'#10b981' };
+
+// Congestion circle cards
+document.getElementById('congCards').innerHTML = AIRPORT_LIST.map(a => {
+  const c = CONGESTION[a.code];
+  const col = levelColor[c.level];
+  const r = 40, circ = 2*Math.PI*r;
+  const offset = circ - (c.pct/100)*circ;
+  return `
+  <div class="cong-card" style="border-top:3px solid ${col}">
+    <div class="cong-code" style="color:${a.color}">${a.code}</div>
+    <div style="font-size:10px;color:var(--text3)">${a.city}</div>
+    <div class="cong-circle-wrap">
+      <svg width="100" height="100" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="${r}" class="cong-circle-bg"/>
+        <circle cx="50" cy="50" r="${r}" class="cong-circle-fg"
+          style="stroke:${col};stroke-dasharray:${circ};stroke-dashoffset:${offset}"/>
+      </svg>
+      <div class="cong-pct" style="color:${col}">${c.pct}%</div>
+    </div>
+    <div style="text-align:center">
+      <span class="badge" style="background:${col}22;color:${col}">${c.level}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px">
+      <div style="text-align:center"><div style="font-size:10px;color:var(--text3)">Daily</div><div style="font-weight:700">${a.dailyFlights}</div></div>
+      <div style="text-align:center"><div style="font-size:10px;color:var(--text3)">Avg Delay</div><div style="font-weight:700;color:${col}">${c.delayAvg}m</div></div>
+    </div>
+  </div>`;
+}).join('');
+
+// Meter bars
+document.getElementById('meterBars').innerHTML = AIRPORT_LIST.map(a => {
+  const c = CONGESTION[a.code];
+  const col = levelColor[c.level];
+  const pct = Math.round(a.dailyFlights/a.capacity*100);
+  return `
+  <div class="meter-row">
+    <span class="meter-code" style="color:${a.color}">${a.code}</span>
+    <div class="meter-bar-wrap"><div class="meter-bar" style="width:${pct}%;background:${col}"></div></div>
+    <div class="meter-right">
+      <span style="font-size:11px;color:${col};font-weight:700;width:32px;text-align:right">${pct}%</span>
+      <span class="badge" style="background:${col}22;color:${col};font-size:9px">${c.level}</span>
+    </div>
+  </div>`;
+}).join('');
+
+// Radar chart
+const radarCtx = document.getElementById('radarChart').getContext('2d');
+new Chart(radarCtx, {
+  type: 'radar',
+  data: {
+    labels: ['Congestion', 'Active Flights', 'Delay Avg', 'Capacity %', 'Terminals'],
+    datasets: AIRPORT_LIST.map(a => {
+      const c = CONGESTION[a.code];
+      return {
+        label: a.code,
+        data: [c.pct, a.activeFlights/2, c.delayAvg*2, Math.round(a.dailyFlights/a.capacity*100), a.terminals*25],
+        borderColor: a.color, backgroundColor: a.color+'18', borderWidth:2, pointRadius:3
+      };
+    })
+  },
+  options: {
+    responsive: true,
+    scales: { r: { grid: { color:'rgba(255,255,255,0.05)' }, ticks: { display:false }, pointLabels: { color:'#94a3b8', font:{size:10} } } },
+    plugins: { legend: { labels: { color:'#94a3b8', font:{size:10} } } }
+  }
+});
+
+// Active bar
+const abCtx = document.getElementById('activeBar').getContext('2d');
+new Chart(abCtx, {
+  type: 'bar',
+  data: {
+    labels: AIRPORT_LIST.map(a=>a.code),
+    datasets: [{ label:'Active Flights', data: AIRPORT_LIST.map(a=>a.activeFlights), backgroundColor: AIRPORT_LIST.map(a=>a.color+'cc'), borderRadius:4 }]
+  },
+  options: { responsive:true, plugins:{legend:{display:false}}, scales:{ x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.03)'}}, y:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}} } }
+});
+
+// Timeline (simulated)
+const tlCtx = document.getElementById('timelineChart').getContext('2d');
+const hours = ['06','08','10','12','14','16','18','20'];
+new Chart(tlCtx, {
+  type: 'line',
+  data: {
+    labels: hours.map(h=>h+':00'),
+    datasets: AIRPORT_LIST.map(a => ({
+      label: a.code,
+      data: hours.map(h => {
+        const base = CONGESTION[a.code].pct;
+        const peak = parseInt(h)>=7&&parseInt(h)<=9||parseInt(h)>=17&&parseInt(h)<=19;
+        return Math.round(base*(peak?1.15:0.85)+Math.random()*8-4);
+      }),
+      borderColor: a.color, backgroundColor:'transparent', borderWidth:2, pointRadius:2, tension:0.4
+    }))
+  },
+  options: { responsive:true, plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}}, scales:{ x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.03)'}}, y:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}} } }
+});
+
+// Aircraft mix tabs
+let acActive = 'DEL';
+function renderAcTable() {
+  const mix = AIRCRAFT_MIX[acActive];
+  document.getElementById('acTable').innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>Aircraft Type</th><th>Count</th><th>Share</th><th>Utilization</th></tr></thead>
+      <tbody>${mix.map(m => `
+        <tr>
+          <td style="font-weight:600;color:var(--text)">${m.type}</td>
+          <td>${m.count}</td>
+          <td>${m.pct}%</td>
+          <td><div class="progress-wrap" style="width:160px"><div class="progress-fill" style="width:${m.pct}%;background:${INDIAN_AIRPORTS[acActive].color}"></div></div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+document.getElementById('acTabs').innerHTML = AIRPORT_LIST.map(a =>
+  `<button class="airport-tab ${a.code===acActive?'active':''}" onclick="acActive='${a.code}';document.querySelectorAll('.airport-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active');renderAcTable()">${a.code} — ${a.city}</button>`
+).join('');
+
+renderAcTable();
+</script>
+</body>
+</html>

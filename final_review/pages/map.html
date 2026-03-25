@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Flight Map — AirIndia Traffic Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <style>
+    #map { height: calc(100vh - var(--header-h) - 210px); border-radius: var(--radius-lg); z-index: 1; min-height: 400px; }
+    .leaflet-container { background: #0d1420 !important; }
+    .leaflet-tile { filter: brightness(.65) saturate(.5) hue-rotate(195deg); }
+
+    /* Stats bar */
+    .map-stats-bar { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:16px; }
+    .map-stat { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:12px; }
+    .map-stat-val { font-family:var(--font-head); font-size:20px; font-weight:700; color:var(--amber); }
+    .map-stat-label { font-size:10px; color:var(--text3); margin-top:2px; }
+
+    /* API status bar */
+    .api-bar {
+      display:flex; align-items:center; gap:10px; padding:8px 14px;
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:var(--radius); margin-bottom:12px; font-size:11px; color:var(--text3);
+      flex-wrap:wrap;
+    }
+    .api-source { font-weight:700; color:var(--text2); }
+    .api-live   { color:#10b981; }
+    .api-sim    { color:#f59e0b; }
+    .api-quota  { margin-left:auto; font-family:var(--font-mono); }
+    .quota-bar  { width:80px; height:4px; background:var(--bg3); border-radius:2px; display:inline-block; vertical-align:middle; margin:0 4px; overflow:hidden; }
+    .quota-fill { height:100%; background:var(--amber); border-radius:2px; transition:width .3s; }
+    .refresh-btn {
+      margin-left:6px; padding:3px 10px; background:transparent;
+      border:1px solid var(--border); border-radius:6px;
+      color:var(--text2); font-size:10px; cursor:pointer; transition:all .15s;
+    }
+    .refresh-btn:hover { border-color:var(--amber); color:var(--amber); }
+
+    /* Legend */
+    .map-legend {
+      position:absolute; bottom:24px; left:16px; z-index:1000;
+      background:rgba(13,20,32,.92); border:1px solid var(--border);
+      border-radius:var(--radius); padding:12px; min-width:170px; backdrop-filter:blur(10px);
+    }
+    .map-legend h4 { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.1em; margin-bottom:8px; }
+    .legend-row { display:flex; align-items:center; gap:7px; margin-bottom:5px; font-size:11px; color:var(--text2); }
+    .legend-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+
+    /* Flight panel */
+    .flight-info-panel {
+      position:absolute; top:16px; right:16px; z-index:1000;
+      background:rgba(13,20,32,.97); border:1px solid var(--border);
+      border-radius:var(--radius-lg); padding:16px; width:270px; display:none;
+      backdrop-filter:blur(12px);
+    }
+    .flight-info-panel.show { display:block; animation:fadeIn .3s; }
+    .info-close { position:absolute; top:10px; right:12px; cursor:pointer; color:var(--text3); font-size:16px; }
+    .info-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+    .info-cell label { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.08em; display:block; }
+    .info-cell span  { font-size:13px; font-weight:600; color:var(--text); }
+
+    /* Pulse ring on airport markers */
+    @keyframes ring { 0%{transform:scale(1);opacity:.8} 100%{transform:scale(1.7);opacity:0} }
+    .pulse-ring { animation: ring 2s ease-out infinite; }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebar-mount"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Live Flight Map</h1>
+        <p>Real-time aircraft positions — DEL · BOM · BLR · MAA · CCU</p>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill" id="livePill"><div class="status-dot"></div>Connecting…</div>
+      </div>
+    </div>
+
+    <div class="page-body fade-in" style="position:relative">
+
+      <!-- API status bar -->
+      <div class="api-bar">
+        <span id="apiSourceLabel" class="api-source">Loading…</span>
+        <span id="apiTimeLabel">–</span>
+        <span id="apiAircraft">–</span>
+        <span class="api-quota" id="apiQuota">
+          Req today: <span id="reqCount">0</span>
+          <span class="quota-bar"><span class="quota-fill" id="quotaFill" style="width:0%"></span></span>
+          / <span id="reqLimit">400</span>
+          <button class="refresh-btn" onclick="manualRefresh()">↻ Refresh</button>
+        </span>
+      </div>
+
+      <!-- Stats bar -->
+      <div class="map-stats-bar">
+        <div class="map-stat"><div class="map-stat-val" id="ms-active">–</div><div class="map-stat-label">Airborne Flights</div></div>
+        <div class="map-stat"><div class="map-stat-val" id="ms-ground">–</div><div class="map-stat-label">On Ground</div></div>
+        <div class="map-stat"><div class="map-stat-val" id="ms-alt">–</div><div class="map-stat-label">Avg Altitude (ft)</div></div>
+        <div class="map-stat"><div class="map-stat-val" id="ms-speed">–</div><div class="map-stat-label">Avg Speed (kts)</div></div>
+        <div class="map-stat"><div class="map-stat-val">5</div><div class="map-stat-label">Airports Tracked</div></div>
+      </div>
+
+      <!-- Map -->
+      <div id="map"></div>
+
+      <!-- Legend -->
+      <div class="map-legend">
+        <h4>Airports</h4>
+        <div class="legend-row"><div class="legend-dot" style="background:#f97316"></div>DEL — Delhi</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#3b82f6"></div>BOM — Mumbai</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#10b981"></div>BLR — Bengaluru</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#8b5cf6"></div>MAA — Chennai</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#ec4899"></div>CCU — Kolkata</div>
+        <hr style="border-color:var(--border);margin:7px 0">
+        <h4>Flight Status</h4>
+        <div class="legend-row"><span style="font-size:13px">✈</span> Airborne</div>
+        <div class="legend-row"><span style="font-size:13px">🟡</span> On Ground</div>
+        <div class="legend-row"><span style="font-size:11px;color:var(--text3)">⬆ climbing  ⬇ descending</span></div>
+      </div>
+
+      <!-- Flight detail panel -->
+      <div class="flight-info-panel" id="flightPanel">
+        <span class="info-close" onclick="document.getElementById('flightPanel').classList.remove('show')">✕</span>
+        <div id="flightPanelContent"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/india-data.js"></script>
+<script src="../js/opensky.js"></script>
+<script src="../js/sidebar.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+renderSidebar('map');
+
+// ── Map init ──────────────────────────────────────────────────
+const map = L.map('map', { center:[20.5, 78.9], zoom:5, zoomControl:true, attributionControl:false });
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap © CARTO', maxZoom: 14
+}).addTo(map);
+
+// Custom popup style
+const ps = document.createElement('style');
+ps.textContent = `.dp .leaflet-popup-content-wrapper{background:#141c2b;border:1px solid #1e2d44;color:#e2e8f0;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.8)}.dp .leaflet-popup-tip{background:#141c2b}.leaflet-popup-close-button{color:#94a3b8!important}`;
+document.head.appendChild(ps);
+
+// ── Airport marker pins ────────────────────────────────────────
+AIRPORT_LIST.forEach(ap => {
+  const col  = ap.color;
+  const size = Math.max(22, Math.min(42, ap.dailyFlights / 35));
+
+  const icon = L.divIcon({
+    className: '',
+    html: `<div style="position:relative;width:${size}px;height:${size}px;">
+      <div class="pulse-ring" style="position:absolute;inset:0;border-radius:50%;border:2px solid ${col};opacity:.5;"></div>
+      <div style="position:absolute;inset:0;border-radius:50%;background:${col}22;border:2px solid ${col};display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:800;color:${col};cursor:pointer;">${ap.code}</div>
+    </div>`,
+    iconSize:[size,size], iconAnchor:[size/2,size/2]
+  });
+
+  L.marker([ap.lat,ap.lng],{icon,zIndexOffset:1000})
+    .addTo(map)
+    .bindPopup(`
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;min-width:210px;padding:4px">
+        <div style="font-size:15px;font-weight:800;color:${col};margin-bottom:4px">${ap.code} — ${ap.city}</div>
+        <div style="color:#94a3b8;font-size:10px;margin-bottom:10px">${ap.name}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">
+          <div><div style="color:#475569;font-size:9px">Daily Flights</div><div style="font-weight:700">${ap.dailyFlights}</div></div>
+          <div><div style="color:#475569;font-size:9px">Runways</div><div style="font-weight:700">${ap.runways}</div></div>
+          <div><div style="color:#475569;font-size:9px">State</div><div style="font-weight:700">${ap.state}</div></div>
+          <div><div style="color:#475569;font-size:9px">Capacity/day</div><div style="font-weight:700">${ap.capacity}</div></div>
+        </div>
+      </div>`,{className:'dp',maxWidth:260});
+});
+
+// ── Flight marker layer group ──────────────────────────────────
+const flightLayer = L.layerGroup().addTo(map);
+const trailLayer  = L.layerGroup().addTo(map);
+
+// ── Render flights from OpenSky data ──────────────────────────
+function renderFlights(results) {
+  flightLayer.clearLayers();
+  trailLayer.clearLayers();
+
+  let totalAirborne = 0, totalGround = 0, totalAlt = 0, totalSpeed = 0, altCount = 0;
+
+  for (const [code, data] of Object.entries(results)) {
+    const ap    = INDIAN_AIRPORTS[code];
+    if (!ap) continue;
+    const col   = ap.color;
+    const flights = data.flights || [];
+
+    flights.forEach(f => {
+      const isGround  = f.onGround || f.altitude < 50;
+      const isClimb   = f.vertical > 1;
+      const isDescend = f.vertical < -1;
+
+      if (isGround) { totalGround++; }
+      else {
+        totalAirborne++;
+        if (f.altitude > 0) { totalAlt += f.altitude; altCount++; }
+        totalSpeed += f.speed;
+      }
+
+      const emoji = isGround ? '⬟' : (isClimb ? '⬆' : isDescend ? '⬇' : '✈');
+      const markerCol = isGround ? '#64748b' : col;
+
+      const icon = L.divIcon({
+        className:'',
+        html:`<div style="
+          font-size:${isGround?10:13}px;
+          transform:rotate(${f.heading}deg);
+          color:${markerCol};
+          filter:drop-shadow(0 0 3px ${markerCol}88);
+          cursor:pointer;line-height:1;
+        ">${emoji}</div>`,
+        iconSize:[16,16], iconAnchor:[8,8]
+      });
+
+      L.marker([f.lat,f.lon],{icon})
+        .addTo(flightLayer)
+        .on('click', () => showFlightPanel(f, ap, isGround));
+
+      // Faint trail line to airport
+      if (!isGround) {
+        L.polyline([[f.lat,f.lon],[ap.lat,ap.lng]],{
+          color:col, weight:.8, opacity:.25, dashArray:'3,6'
+        }).addTo(trailLayer);
+      }
+    });
+  }
+
+  // Update stats
+  document.getElementById('ms-active').textContent = totalAirborne;
+  document.getElementById('ms-ground').textContent  = totalGround;
+  document.getElementById('ms-alt').textContent    = altCount ? Math.round(totalAlt/altCount).toLocaleString() : '–';
+  document.getElementById('ms-speed').textContent  = totalAirborne ? Math.round(totalSpeed/totalAirborne) : '–';
+}
+
+// ── Flight detail panel ────────────────────────────────────────
+function showFlightPanel(f, ap, isGround) {
+  const pred = predictDelay(ap.code, new Date().getHours());
+  const statusStr = isGround ? 'On Ground' : (f.vertical>1?'Climbing':f.vertical<-1?'Descending':'Cruising');
+  const statusCol = isGround ? '#94a3b8' : (f.vertical>1?'#10b981':f.vertical<-1?'#f59e0b':'#3b82f6');
+
+  document.getElementById('flightPanelContent').innerHTML = `
+    <div style="font-size:15px;font-weight:800;color:${ap.color};margin-bottom:2px">${f.callsign}</div>
+    <div style="font-size:10px;color:var(--text3);margin-bottom:12px">Near ${ap.code} · ${ap.city}${f._simulated?' · (simulated)':''}</div>
+    <div class="info-row">
+      <div class="info-cell"><label>Altitude</label><span>${f.altitude ? f.altitude.toLocaleString()+' ft' : 'Ground'}</span></div>
+      <div class="info-cell"><label>Speed</label><span>${f.speed || 0} kts</span></div>
+      <div class="info-cell"><label>Heading</label><span>${Math.round(f.heading)}°</span></div>
+      <div class="info-cell"><label>Status</label><span style="color:${statusCol}">${statusStr}</span></div>
+    </div>
+     ${f.origin ? `<div style="font-size:10px;color:var(--text3);margin-bottom:10px">Origin country: ${f.origin}</div>` : ''}
+    <!-- <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px">
+      <div style="font-size:9px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em">🤖 AI Delay Prediction for ${ap.code}</div>
+      <div style="font-size:18px;font-weight:800;color:${pred.riskColor}">${pred.predicted} min</div>
+      <div style="font-size:11px;color:${pred.riskColor}">${pred.label} · ${pred.confidence}% confidence</div>
+    </div> -->
+    `;
+
+  document.getElementById('flightPanel').classList.add('show');
+}
+
+// ── Update status bar ──────────────────────────────────────────
+function updateStatusBar(anyReal, results) {
+  const pill = document.getElementById('livePill');
+  const src  = document.getElementById('apiSourceLabel');
+  const timeL = document.getElementById('apiTimeLabel');
+  const aircraftL = document.getElementById('apiAircraft');
+  const stats = OpenSky.stats();
+  const total = Object.values(results).reduce((s,d)=>(d.flights?s+d.flights.length:s),0);
+
+  if (anyReal) {
+    pill.innerHTML = '<div class="status-dot"></div>Live Data';
+    src.innerHTML  = '<span class="api-live">● LIVE</span> OpenSky Network';
+  } else {
+    pill.innerHTML = '<div class="status-dot" style="background:#f59e0b"></div>Simulated';
+    src.innerHTML  = '<span class="api-sim">● SIMULATED</span> (OpenSky unavailable / rate-limited)';
+  }
+
+  timeL.textContent    = `Updated: ${new Date().toLocaleTimeString()}`;
+  aircraftL.textContent = `${total} aircraft tracked`;
+  document.getElementById('reqCount').textContent  = stats.requestsToday;
+  document.getElementById('reqLimit').textContent  = stats.dailyLimit;
+  document.getElementById('quotaFill').style.width = stats.pct + '%';
+}
+
+// ── Wire up OpenSky ────────────────────────────────────────────
+OpenSky.onUpdate((results, anyReal) => {
+  renderFlights(results);
+  updateStatusBar(anyReal, results);
+});
+
+OpenSky.start();
+
+function manualRefresh() {
+  document.getElementById('apiSourceLabel').textContent = 'Refreshing…';
+  OpenSky.stop();
+  OpenSky.start();
+}
+</script>
+</body>
+</html>

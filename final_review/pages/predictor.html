@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Predictor — AirIndia Traffic Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .predictor-grid { display:grid; grid-template-columns:390px 1fr; gap:20px; }
+    .input-group { margin-bottom:14px; }
+    .input-group label { display:block; font-size:10px; color:var(--text3); letter-spacing:.1em; text-transform:uppercase; margin-bottom:6px; }
+    select { background:var(--bg3); border:1px solid var(--border2); color:var(--text); padding:8px 12px; border-radius:var(--radius); font-family:var(--font-mono); font-size:12px; width:100%; outline:none; cursor:pointer; }
+    input[type=range] { accent-color:var(--amber); cursor:pointer; width:100%; }
+    .predict-btn { width:100%; padding:12px; background:var(--amber-glow); border:1px solid var(--amber-dim); color:var(--amber); border-radius:var(--radius); font-family:var(--font-head); font-size:14px; font-weight:700; cursor:pointer; transition:all .2s; letter-spacing:.05em; }
+    .predict-btn:hover { background:rgba(245,158,11,.2); }
+    .result-box { background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius-lg); padding:20px; text-align:center; display:none; }
+    .result-box.show { display:block; animation:fadeIn .4s ease; }
+    .result-delay { font-family:var(--font-head); font-size:56px; font-weight:800; line-height:1; }
+    .result-label { font-size:14px; margin-top:8px; }
+    .result-conf  { font-size:11px; color:var(--text3); margin-top:4px; }
+    .algo-explain { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-top:14px; }
+    .algo-explain h4 { font-family:var(--font-head); font-size:12px; color:var(--amber); margin-bottom:8px; }
+    .algo-explain p { font-size:11px; color:var(--text3); line-height:1.7; }
+    .feature-bars { margin-top:12px; }
+    .feature-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+    .feature-name { font-size:10px; color:var(--text3); width:130px; flex-shrink:0; }
+    .feature-bar-wrap { flex:1; background:var(--bg3); border-radius:3px; height:6px; }
+    .feature-bar { height:100%; border-radius:3px; background:var(--amber); }
+    .feature-val { font-size:10px; color:var(--text2); width:40px; text-align:right; flex-shrink:0; }
+    .all-predict-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:20px; }
+    .ap-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-lg); padding:14px; text-align:center; transition:border-color .2s; }
+    .ap-card:hover { border-color:var(--amber); }
+    .ap-code  { font-family:var(--font-head); font-size:20px; font-weight:800; }
+    .ap-delay { font-size:24px; font-weight:700; font-family:var(--font-head); }
+    .ap-label { font-size:10px; color:var(--text3); margin-top:2px; }
+    .ap-live  { font-size:9px; margin-top:4px; }
+
+    /* Live data badge */
+    .live-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      font-size:9px; font-weight:700; letter-spacing:.08em;
+      padding:2px 8px; border-radius:20px;
+      background:rgba(16,185,129,.12); color:#10b981;
+      border:1px solid rgba(16,185,129,.2); text-transform:uppercase;
+    }
+    .live-badge.sim { background:rgba(245,158,11,.1); color:#f59e0b; border-color:rgba(245,158,11,.2); }
+
+    /* Live factor card */
+    .live-factors-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .factor-cell { background:var(--bg3); border-radius:6px; padding:8px 10px; }
+    .factor-label { font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:.08em; }
+    .factor-val   { font-size:14px; font-weight:700; margin-top:3px; }
+    .factor-sub   { font-size:9px; color:var(--text3); margin-top:1px; }
+
+    .opensky-note {
+      font-size:10px; color:var(--text3); background:var(--surface2);
+      border:1px solid var(--border); border-radius:var(--radius);
+      padding:10px 12px; margin-bottom:14px; line-height:1.7;
+    }
+    .opensky-note strong { color:var(--text2); }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebar-mount"></div>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>AI Delay Predictor</h1>
+        <p>k-NN algorithm · Live congestion data from OpenSky Network</p>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill" id="predStatusPill"><div class="status-dot"></div>Loading live data…</div>
+      </div>
+    </div>
+
+    <div class="page-body fade-in">
+
+      <!-- All-airport snapshot (updates when OpenSky data arrives) -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="card-title">Current Predicted Delays — All Airports</div>
+        <span id="snapBadge" class="live-badge sim">● Simulated</span>
+      </div>
+      <div class="all-predict-grid" id="allPredict"></div>
+
+      <div class="predictor-grid">
+
+        <!-- ── Input panel ── -->
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title" style="margin-bottom:16px">Custom Prediction</div>
+
+            <div class="input-group">
+              <label>Select Airport</label>
+              <select id="selAirport" onchange="onAirportChange()">
+                <option value="DEL">DEL — Indira Gandhi Intl, Delhi</option>
+                <option value="BOM">BOM — CSMIA Mumbai</option>
+                <option value="BLR">BLR — Kempegowda Intl, Bengaluru</option>
+                <option value="MAA">MAA — Chennai International</option>
+                <option value="CCU">CCU — NSCBI Kolkata</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>Hour of Day: <span id="hourLabel">08:00</span></label>
+              <input type="range" id="hourSlider" min="0" max="23" value="8"
+                     oninput="document.getElementById('hourLabel').textContent=String(this.value).padStart(2,'0')+':00'">
+            </div>
+
+            <!-- Live factors from OpenSky -->
+            <div id="live-factors" style="margin-bottom:16px"></div>
+
+            <button class="predict-btn" id="predictBtn" onclick="runPredict()">⚡ Run Prediction</button>
+          </div>
+
+          <!-- Result -->
+          <div class="result-box" id="resultBox">
+            <div class="result-delay" id="resultDelay">--</div>
+            <div class="result-label" id="resultLabel">--</div>
+            <div class="result-conf"  id="resultConf">--</div>
+          </div>
+
+          <!-- Algorithm explanation -->
+          <div class="algo-explain" style="margin-top:14px">
+            <h4>🤖 How This Works</h4>
+            <p>
+              Uses <strong style="color:var(--text)">k-Nearest Neighbors (k=3)</strong>, trained on 25 historical records.<br><br>
+              <strong style="color:var(--amber)">NEW:</strong> When OpenSky data is available, <strong style="color:var(--text)">live aircraft count</strong> near each airport replaces the static congestion % — making predictions dynamic and real.<br><br>
+              Features: Congestion · Wind · Humidity · Hour of Day · Live traffic density
+            </p>
+          </div>
+        </div>
+
+        <!-- ── Charts panel ── -->
+        <div>
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-head">
+              <div class="card-title">Feature Importance (Input Weights)</div>
+            </div>
+            <div class="feature-bars">
+              <div class="feature-row"><span class="feature-name">Congestion %</span><div class="feature-bar-wrap"><div class="feature-bar" style="width:85%"></div></div><span class="feature-val">85%</span></div>
+              <div class="feature-row"><span class="feature-name">Live Traffic Density</span><div class="feature-bar-wrap"><div class="feature-bar" style="width:78%;background:#10b981"></div></div><span class="feature-val">78%</span></div>
+              <div class="feature-row"><span class="feature-name">Wind Speed</span><div class="feature-bar-wrap"><div class="feature-bar" style="width:70%;background:var(--blue)"></div></div><span class="feature-val">70%</span></div>
+              <div class="feature-row"><span class="feature-name">Humidity</span><div class="feature-bar-wrap"><div class="feature-bar" style="width:55%;background:var(--purple)"></div></div><span class="feature-val">55%</span></div>
+              <div class="feature-row"><span class="feature-name">Hour of Day</span><div class="feature-bar-wrap"><div class="feature-bar" style="width:45%;background:var(--green)"></div></div><span class="feature-val">45%</span></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-head"><div class="card-title">Predicted Delay by Hour — Selected Airport</div></div>
+            <div class="chart-wrap"><canvas id="delayByHourChart" height="190"></canvas></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><div class="card-title">All Airports — Avg Predicted Delay (live-adjusted)</div></div>
+            <div class="chart-wrap"><canvas id="airportCompareChart" height="170"></canvas></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../js/india-data.js"></script>
+<script src="../js/opensky.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+renderSidebar('predictor');
+
+// ── Live OpenSky stats (updated when data arrives) ─────────────
+let liveStats = {};   // { DEL: { airborneCount, avgSpeed, real }, ... }
+let hasRealData = false;
+
+// ── Enhanced predictDelay that uses live congestion when available ──
+function predictDelayLive(airportCode, hourOfDay) {
+  const airport    = INDIAN_AIRPORTS[airportCode];
+  const congestion = CONGESTION[airportCode];
+  const weather    = WEATHER[airportCode];
+  if (!airport || !congestion || !weather) return null;
+
+  // Base congestion — override with live aircraft density if available
+  let congPct = congestion.pct;
+  if (liveStats[airportCode]) {
+    const live = liveStats[airportCode];
+    // Normalize airborne count to 0–100% against airport capacity
+    const density = Math.min(100, Math.round(live.airborneCount / airport.dailyFlights * 24 * 100));
+    // Blend: 60% live, 40% static (avoids wild swings)
+    congPct = Math.round(density * 0.6 + congPct * 0.4);
+  }
+
+  const wind     = weather.wind;
+  const humidity = weather.humidity;
+  const hour     = hourOfDay;
+
+  const distances = DELAY_TRAINING_DATA.map(row => {
+    const d = Math.sqrt(
+      Math.pow((row[0]-congPct)/100, 2) +
+      Math.pow((row[1]-wind)/40, 2) +
+      Math.pow((row[2]-humidity)/100, 2) +
+      Math.pow((row[3]-hour)/24, 2)
+    );
+    return { d, delay: row[4] };
+  });
+  distances.sort((a,b) => a.d - b.d);
+  const k   = 3;
+  const knn = distances.slice(0, k);
+  const predicted = Math.round(knn.reduce((s,x) => s + x.delay, 0) / k);
+  const confidence = Math.max(40, Math.min(95, 100 - distances[0].d * 200));
+  const label = predicted <= 5 ? 'On Time' : predicted <= 20 ? 'Minor Delay' : predicted <= 40 ? 'Moderate Delay' : 'Major Delay';
+  const riskColor = predicted <= 5 ? '#10b981' : predicted <= 20 ? '#f59e0b' : predicted <= 40 ? '#f97316' : '#ef4444';
+
+  return { predicted, label, confidence: Math.round(confidence), riskColor, congPct };
+}
+
+// ── Render all-airport snapshot ────────────────────────────────
+function renderSnapshot() {
+  const hour = new Date().getHours();
+  document.getElementById('allPredict').innerHTML = AIRPORT_LIST.map(a => {
+    const r    = predictDelayLive(a.code, hour);
+    const live = liveStats[a.code];
+    const liveStr = live
+      ? `<div class="ap-live" style="color:${live.real?'#10b981':'#f59e0b'}">${live.real?'●':'○'} ${live.airborneCount} airborne</div>`
+      : '';
+    return `<div class="ap-card" style="border-top:3px solid ${a.color}">
+      <div class="ap-code" style="color:${a.color}">${a.code}</div>
+      <div class="ap-delay" style="color:${r.riskColor}">${r.predicted}m</div>
+      <div class="ap-label">${r.label}</div>
+      <div style="font-size:9px;color:var(--text3);margin-top:3px">${r.confidence}% conf.</div>
+      ${liveStr}
+    </div>`;
+  }).join('');
+}
+
+// ── Live factors panel ─────────────────────────────────────────
+function updateLiveFactors() {
+  const code = document.getElementById('selAirport').value;
+  const w    = WEATHER[code];
+  const c    = CONGESTION[code];
+  const live = liveStats[code];
+  const r    = predictDelayLive(code, parseInt(document.getElementById('hourSlider').value));
+
+  const trafficHtml = live ? `
+    <div class="factor-cell">
+      <div class="factor-label">Live Airborne</div>
+      <div class="factor-val" style="color:${live.real?'#10b981':'#f59e0b'}">${live.airborneCount}</div>
+      <div class="factor-sub">${live.real?'OpenSky real':'simulated'}</div>
+    </div>
+    <div class="factor-cell">
+      <div class="factor-label">Avg Speed</div>
+      <div class="factor-val" style="color:#3b82f6">${live.avgSpeed} kts</div>
+      <div class="factor-sub">airborne aircraft</div>
+    </div>` : `
+    <div class="factor-cell">
+      <div class="factor-label">Live Traffic</div>
+      <div class="factor-val" style="color:#f59e0b">Loading…</div>
+      <div class="factor-sub">fetching OpenSky</div>
+    </div>`;
+
+  document.getElementById('live-factors').innerHTML = `
+    <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">
+      Live Conditions — ${code}
+      <span class="live-badge ${live&&live.real?'':'sim'}" style="margin-left:6px">${live&&live.real?'● Live':'○ Simulated'}</span>
+    </div>
+    <div class="live-factors-grid">
+      <div class="factor-cell">
+        <div class="factor-label">Congestion (blended)</div>
+        <div class="factor-val" style="color:var(--amber)">${r ? r.congPct : c.pct}%</div>
+        <div class="factor-sub">live-adjusted</div>
+      </div>
+      <div class="factor-cell">
+        <div class="factor-label">Weather</div>
+        <div class="factor-val">${w.icon} ${w.condition}</div>
+        <div class="factor-sub">current</div>
+      </div>
+      <div class="factor-cell">
+        <div class="factor-label">Wind</div>
+        <div class="factor-val" style="color:#3b82f6">${w.wind} km/h</div>
+        <div class="factor-sub">surface</div>
+      </div>
+      <div class="factor-cell">
+        <div class="factor-label">Humidity</div>
+        <div class="factor-val" style="color:#8b5cf6">${w.humidity}%</div>
+        <div class="factor-sub">relative</div>
+      </div>
+      ${trafficHtml}
+    </div>`;
+}
+
+// ── Predict click ──────────────────────────────────────────────
+function runPredict() {
+  const code = document.getElementById('selAirport').value;
+  const hour = parseInt(document.getElementById('hourSlider').value);
+  const r    = predictDelayLive(code, hour);
+  const box  = document.getElementById('resultBox');
+
+  document.getElementById('resultDelay').textContent = r.predicted + ' min';
+  document.getElementById('resultDelay').style.color = r.riskColor;
+  document.getElementById('resultLabel').textContent = r.label;
+  document.getElementById('resultLabel').style.color = r.riskColor;
+  document.getElementById('resultConf').textContent  =
+    `k-NN confidence: ${r.confidence}%  ·  Live congestion used: ${r.congPct}%`;
+  box.classList.add('show');
+  updateHourChart();
+}
+
+// ── Hour chart ──────────────────────────────────────────────────
+let hourChart, compareChart;
+function updateHourChart() {
+  const code = document.getElementById('selAirport').value;
+  const ap   = INDIAN_AIRPORTS[code];
+  const preds = Array.from({length:24}, (_,h) => predictDelayLive(code, h).predicted);
+
+  const ctx = document.getElementById('delayByHourChart').getContext('2d');
+  if (hourChart) hourChart.destroy();
+  hourChart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels: Array.from({length:24},(_,h)=>h+':00'),
+      datasets:[{
+        label:'Predicted Delay (min)',
+        data: preds,
+        borderColor: ap.color,
+        backgroundColor: ap.color+'18',
+        fill:true, tension:.4, pointRadius:3,
+        pointBackgroundColor: ap.color
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#475569',font:{size:9},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.03)'}},
+        y:{ticks:{color:'#475569',font:{size:10}},grid:{color:'rgba(255,255,255,0.04)'},
+           title:{display:true,text:'Delay (min)',color:'#475569',font:{size:10}}}
+      }
+    }
+  });
+}
+
+function updateCompareChart() {
+  const ctx = document.getElementById('airportCompareChart').getContext('2d');
+  if (compareChart) compareChart.destroy();
+  compareChart = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels: AIRPORT_LIST.map(a=>a.code),
+      datasets:[{
+        label:'Avg Predicted Delay (min)',
+        data: AIRPORT_LIST.map(a => {
+          const preds = Array.from({length:24},(_,h)=>predictDelayLive(a.code,h).predicted);
+          return Math.round(preds.reduce((s,v)=>s+v,0)/24);
+        }),
+        backgroundColor: AIRPORT_LIST.map(a=>a.color+'cc'),
+        borderRadius:4
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.03)'}},
+        y:{ticks:{color:'#475569'},grid:{color:'rgba(255,255,255,0.04)'}}
+      }
+    }
+  });
+}
+
+// ── Airport change ─────────────────────────────────────────────
+function onAirportChange() {
+  updateLiveFactors();
+  updateHourChart();
+}
+
+// ── OpenSky integration ────────────────────────────────────────
+OpenSky.onUpdate((results, anyReal) => {
+  liveStats    = OpenSky.buildAirportStats(results);
+  hasRealData  = anyReal;
+
+  const pill   = document.getElementById('predStatusPill');
+  const badge  = document.getElementById('snapBadge');
+
+  if (anyReal) {
+    pill.innerHTML = '<div class="status-dot"></div>Live Data Active';
+    badge.textContent = '● Live OpenSky';
+    badge.className   = 'live-badge';
+  } else {
+    pill.innerHTML = '<div class="status-dot" style="background:#f59e0b"></div>Simulated Mode';
+    badge.textContent = '○ Simulated';
+    badge.className   = 'live-badge sim';
+  }
+
+  renderSnapshot();
+  updateLiveFactors();
+  updateHourChart();
+  updateCompareChart();
+});
+
+OpenSky.start();
+
+// ── Initial render (before OpenSky returns) ────────────────────
+renderSnapshot();
+updateLiveFactors();
+updateHourChart();
+updateCompareChart();
+</script>
+</body>
+</html>

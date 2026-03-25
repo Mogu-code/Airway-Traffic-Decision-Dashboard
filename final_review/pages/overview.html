@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overview — AirIndia Traffic Dashboard</title>
+  <link rel="stylesheet" href="../css/shared.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <div id="sidebar-mount"></div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Dashboard Overview</h1>
+        <p>5 Major Indian Airports · Live Traffic Data</p>
+      </div>
+      <div class="topbar-right">
+        <div class="status-pill"><div class="status-dot"></div>System Live</div>
+        <span style="font-size:11px;color:var(--text3)" id="live-time"></span>
+      </div>
+    </div>
+
+    <div class="page-body fade-in">
+
+      <!-- KPI Row -->
+      <div class="kpi-grid" id="kpi-grid"></div>
+
+      <!-- Airport Cards -->
+      <div style="margin-bottom:20px">
+        <div class="card-title" style="margin-bottom:12px">Airport Status — India</div>
+        <div class="grid-3" id="airport-cards"></div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Hourly Traffic Volume (Today)</div>
+          </div>
+          <div class="chart-wrap"><canvas id="hourlyChart" height="180"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Daily Flights by Airport</div>
+          </div>
+          <div class="chart-wrap"><canvas id="airportBarChart" height="180"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Recent Flights -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Recent Flights</div>
+          <a href="../pages/delays.html" style="font-size:11px;color:var(--amber);text-decoration:none">View All →</a>
+        </div>
+        <table class="data-table" id="flightsTable"></table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/india-data.js"></script>
+<script src="../js/sidebar.js"></script>
+<script>
+renderSidebar('overview');
+
+// Live clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('live-time').textContent = now.toLocaleTimeString('en-IN', {timeZone:'Asia/Kolkata'}) + ' IST';
+}
+setInterval(updateClock, 1000); updateClock();
+
+// KPIs
+const totalFlights = AIRPORT_LIST.reduce((s,a) => s+a.dailyFlights, 0);
+const totalActive  = AIRPORT_LIST.reduce((s,a) => s+a.activeFlights, 0);
+const totalCap     = AIRPORT_LIST.reduce((s,a) => s+a.capacity, 0);
+const avgCong      = Math.round(AIRPORT_LIST.reduce((s,a) => s+CONGESTION[a.code].pct, 0)/5);
+const cancelCount  = LIVE_FLIGHTS.filter(f=>f.status==='Cancelled').length;
+const delayCount   = LIVE_FLIGHTS.filter(f=>f.status==='Delayed').length;
+
+const kpis = [
+  { label:'Total Flights Today', value: totalFlights.toLocaleString(), sub:'Across 5 airports', color:'var(--amber)' },
+  { label:'Active Right Now',    value: totalActive,   sub:'Flights in the air', color:'var(--green)' },
+  { label:'Avg Congestion',      value: avgCong+'%',   sub:'System-wide load',   color:'var(--orange)' },
+  { label:'Delayed Today',       value: delayCount,    sub:'Requiring attention', color:'var(--red)' },
+  { label:'System Capacity',     value: totalCap,      sub:'Max daily slots',    color:'var(--blue)' },
+];
+
+document.getElementById('kpi-grid').innerHTML = kpis.map(k => `
+  <div class="kpi-card" style="--kpi-color:${k.color}">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value">${k.value}</div>
+    <div class="kpi-sub">${k.sub}</div>
+  </div>`).join('');
+
+// Airport cards
+document.getElementById('airport-cards').innerHTML = AIRPORT_LIST.map(a => {
+  const c = CONGESTION[a.code];
+  const w = WEATHER[a.code];
+  const pct = Math.round(a.dailyFlights/a.capacity*100);
+  const colMap = {Critical:'var(--red)',High:'var(--orange)',Moderate:'var(--amber)',Low:'var(--green)'};
+  const col = colMap[c.level] || 'var(--text2)';
+  return `
+  <div class="card" style="border-top:3px solid ${a.color}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div>
+        <div style="font-family:var(--font-head);font-size:22px;font-weight:800;color:${a.color}">${a.code}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${a.city}</div>
+      </div>
+      <div style="font-size:20px">${w.icon}</div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px;line-height:1.4">${a.name}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+      <div><div style="font-size:10px;color:var(--text3)">Daily Flights</div><div style="font-size:15px;font-weight:700;color:var(--text)">${a.dailyFlights}</div></div>
+      <div><div style="font-size:10px;color:var(--text3)">Active Now</div><div style="font-size:15px;font-weight:700;color:var(--text)">${a.activeFlights}</div></div>
+      <div><div style="font-size:10px;color:var(--text3)">Runways</div><div style="font-size:15px;font-weight:700;color:var(--text)">${a.runways}</div></div>
+      <div><div style="font-size:10px;color:var(--text3)">Avg Delay</div><div style="font-size:15px;font-weight:700;color:${col}">${c.delayAvg}m</div></div>
+    </div>
+    <div style="margin-bottom:6px;display:flex;justify-content:space-between">
+      <span style="font-size:10px;color:var(--text3)">Capacity Load</span>
+      <span style="font-size:10px;color:${col};font-weight:600">${c.level} · ${pct}%</span>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" style="width:${pct}%;background:${col}"></div></div>
+  </div>`;
+}).join('');
+
+// Hourly chart
+const hCtx = document.getElementById('hourlyChart').getContext('2d');
+new Chart(hCtx, {
+  type: 'line',
+  data: {
+    labels: HOURLY_TRAFFIC.map(h=>h.hour),
+    datasets: [{
+      label: 'Traffic Volume',
+      data: HOURLY_TRAFFIC.map(h=>h.volume),
+      borderColor: '#f59e0b',
+      backgroundColor: 'rgba(245,158,11,0.08)',
+      borderWidth: 2, pointRadius: 0, fill: true, tension: 0.4
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#475569', font: { size: 10 }, maxTicksLimit: 8 } },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#475569', font: { size: 10 } } }
+    }
+  }
+});
+
+// Airport bar chart
+const bCtx = document.getElementById('airportBarChart').getContext('2d');
+new Chart(bCtx, {
+  type: 'bar',
+  data: {
+    labels: AIRPORT_LIST.map(a=>a.code),
+    datasets: [
+      { label: 'Daily Flights', data: AIRPORT_LIST.map(a=>a.dailyFlights), backgroundColor: AIRPORT_LIST.map(a=>a.color+'cc'), borderRadius: 4 },
+      { label: 'Capacity',      data: AIRPORT_LIST.map(a=>a.capacity),     backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 4 }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { labels: { color: '#94a3b8', font: { size: 10 } } } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#475569', font: { size: 11 } } },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#475569', font: { size: 10 } } }
+    }
+  }
+});
+
+// Flights table
+const headers = ['Flight','Airline','From','To','Dep.','Arr.','Status'];
+document.getElementById('flightsTable').innerHTML = `
+  <thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+  <tbody>${LIVE_FLIGHTS.slice(0,8).map(f => {
+    const badge = f.status==='On Time' ? 'badge-green' : f.status==='Cancelled' ? 'badge-red' : 'badge-orange';
+    return `<tr>
+      <td style="font-weight:600;color:var(--text)">${f.no}</td>
+      <td>${f.airline}</td>
+      <td><span class="badge badge-blue">${f.from}</span></td>
+      <td><span class="badge badge-blue">${f.to}</span></td>
+      <td>${f.dep}</td>
+      <td>${f.arr}</td>
+      <td><span class="badge ${badge}">${f.status}${f.delay?` +${f.delay}`:''}</span></td>
+    </tr>`;
+  }).join('')}</tbody>`;
+</script>
+</body>
+</html>
