@@ -258,12 +258,13 @@ function showFlightPanel(f, ap, isGround) {
       <div class="info-cell"><label>Heading</label><span>${Math.round(f.heading)}°</span></div>
       <div class="info-cell"><label>Status</label><span style="color:${statusCol}">${statusStr}</span></div>
     </div>
-    ${f.origin ? `<div style="font-size:10px;color:var(--text3);margin-bottom:10px">Origin country: ${f.origin}</div>` : ''}
-    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px">
+     ${f.origin ? `<div style="font-size:10px;color:var(--text3);margin-bottom:10px">Origin country: ${f.origin}</div>` : ''}
+    <!-- <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px">
       <div style="font-size:9px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em">🤖 AI Delay Prediction for ${ap.code}</div>
       <div style="font-size:18px;font-weight:800;color:${pred.riskColor}">${pred.predicted} min</div>
       <div style="font-size:11px;color:${pred.riskColor}">${pred.label} · ${pred.confidence}% confidence</div>
-    </div>`;
+    </div> -->
+    `;
 
   document.getElementById('flightPanel').classList.add('show');
 }
