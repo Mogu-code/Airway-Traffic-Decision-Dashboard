@@ -1,26 +1,3 @@
-/**
- * opensky.js — OpenSky Network API Service
- * For AirIndia Traffic Dashboard
- *
- * ═══════════════════════════════════════════════════════════
- *  OPENSKY FREE TIER LIMITS (important for your teacher demo)
- * ═══════════════════════════════════════════════════════════
- *  • Anonymous (no login):  400 requests / day,  10 req / 10 sec
- *  • Free account (logged): 4000 requests / day, 10 req / 10 sec
- *  • Data freshness:        5-second update interval from sensors
- *  • API keys:              No API key needed — just a free account
- *                           You register ONCE at opensky-network.org
- *                           One account per person, no key rotation needed
- *  • History endpoint:      Free accounts get last 1 hour of data
- *  • We recommend:          Create ONE free account, use credentials
- *                           below. For class demo this is plenty.
- *
- *  HOW TO USE YOUR OWN ACCOUNT:
- *    Set OPENSKY_USER and OPENSKY_PASS below.
- *    With credentials → 4000 req/day (one request every ~21 seconds
- *    comfortably). We poll every 60s so that's only ~1440 req/day.
- * ═══════════════════════════════════════════════════════════
- */
 
 const OpenSky = (() => {
 
